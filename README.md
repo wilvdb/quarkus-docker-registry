@@ -1,2 +1,2 @@
-# quarkus-docker-registry
-Basic Docker registry implementation based on Quarkus
+# quarkus-docker-dockerregistry
+Basic Docker dockerregistry implementation based on Quarkus

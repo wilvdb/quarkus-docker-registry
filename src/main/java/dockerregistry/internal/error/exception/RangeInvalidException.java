@@ -1,0 +1,14 @@
+package dockerregistry.internal.error.exception;
+
+import dockerregistry.internal.error.model.Error;
+
+public class RangeInvalidException extends AbstractRegistryException {
+
+    public RangeInvalidException() {
+    }
+
+    @Override
+    public Error getError() {
+        return ErrorIdentifier.RANGE_INVALID.getError();
+    }
+}
