@@ -47,19 +47,15 @@ public class ManifestService {
         try (var outputChannel = Files.newByteChannel(tagPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
             logger.debug("Write manifest to file {}", tagPath);
             outputChannel.write(ByteBuffer.wrap(input.readAllBytes()));
-        } catch (IOException e) {
-            throw new ManifestBlobUnknownException(e);
-        }
 
-        var hash = getSha256(name, reference);
-        var hashPath = path.resolve(hash + ".json");
-        try {
+            var hash = getSha256(name, reference);
+            var hashPath = path.resolve(hash + ".json");
             Files.copy(tagPath, hashPath);
+
+            return hash;
         } catch (IOException e) {
             throw new ManifestBlobUnknownException(e);
         }
-
-        return hash;
     }
 
     public String getSha256(String name, String reference) {
