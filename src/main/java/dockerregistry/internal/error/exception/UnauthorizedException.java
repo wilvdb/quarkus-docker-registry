@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class UnauthorizedException extends AbstractRegistryException {
+public class UnauthorizedException extends RegistryException {
 
     public UnauthorizedException() {
     }

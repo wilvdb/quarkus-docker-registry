@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class SizeInvalidException extends AbstractRegistryException {
+public class SizeInvalidException extends RegistryException {
 
     public SizeInvalidException() {
     }

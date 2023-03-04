@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class NameUnknownException extends AbstractRegistryException {
+public class NameUnknownException extends RegistryException {
 
     public NameUnknownException() {
     }

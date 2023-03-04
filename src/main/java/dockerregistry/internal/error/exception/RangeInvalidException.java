@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class RangeInvalidException extends AbstractRegistryException {
+public class RangeInvalidException extends RegistryException {
 
     public RangeInvalidException() {
     }

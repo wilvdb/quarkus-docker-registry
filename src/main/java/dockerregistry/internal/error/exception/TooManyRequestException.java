@@ -2,13 +2,10 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class DeniedException extends RegistryException {
-
-    public DeniedException() {
-    }
+public class TooManyRequestException extends RegistryException {
 
     @Override
     public Error getError() {
-        return ErrorIdentifier.DENIED.getError();
+        return ErrorIdentifier.TOO_MANY_REQUEST.getError();
     }
 }

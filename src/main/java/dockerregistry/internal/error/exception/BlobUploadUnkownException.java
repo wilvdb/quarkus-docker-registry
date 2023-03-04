@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class BlobUploadUnkownException extends AbstractRegistryException {
+public class BlobUploadUnkownException extends RegistryException {
 
     public BlobUploadUnkownException() {
     }

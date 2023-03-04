@@ -2,13 +2,13 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public abstract class AbstractRegistryException extends RuntimeException {
+public abstract class RegistryException extends RuntimeException {
 
-    public AbstractRegistryException() {
+    public RegistryException() {
         super();
     }
 
-    public AbstractRegistryException(Throwable throwable) {
+    public RegistryException(Throwable throwable) {
         super(throwable);
     }
     public abstract Error getError();

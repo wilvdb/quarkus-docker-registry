@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class ManifestInvalidException extends AbstractRegistryException {
+public class ManifestInvalidException extends RegistryException {
 
     public ManifestInvalidException() {
     }

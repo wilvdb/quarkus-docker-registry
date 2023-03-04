@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class ManifestUnverifiedException extends AbstractRegistryException {
+public class ManifestUnverifiedException extends RegistryException {
 
     public ManifestUnverifiedException() {
     }

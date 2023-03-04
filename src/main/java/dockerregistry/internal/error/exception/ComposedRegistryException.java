@@ -8,15 +8,15 @@ import java.util.List;
 
 public class ComposedRegistryException extends RuntimeException {
 
-    private List<AbstractRegistryException> exceptions;
+    private List<RegistryException> exceptions;
 
-    ComposedRegistryException(List<AbstractRegistryException> exceptions) {
+    ComposedRegistryException(List<RegistryException> exceptions) {
         this.exceptions = exceptions;
     }
 
     public Errors getErrors() {
         return new Errors(exceptions.stream()
-                .map(AbstractRegistryException::getError)
+                .map(RegistryException::getError)
                 .toArray(Error[]::new));
     }
 
@@ -29,17 +29,17 @@ public class ComposedRegistryException extends RuntimeException {
     }
 
     static class Builder {
-        private List<AbstractRegistryException> exceptions;
+        private List<RegistryException> exceptions;
 
         public Builder() {
             this.exceptions = new ArrayList<>();
         }
 
-        public Builder(List<AbstractRegistryException> exceptions) {
+        public Builder(List<RegistryException> exceptions) {
             this.exceptions = exceptions;
         }
 
-        public Builder add(AbstractRegistryException exception) {
+        public Builder add(RegistryException exception) {
             exceptions.add(exception);
 
             return this;

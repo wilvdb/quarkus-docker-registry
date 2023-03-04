@@ -2,7 +2,7 @@ package dockerregistry.internal.error.exception;
 
 import dockerregistry.internal.error.model.Error;
 
-public class TagInvalidException extends AbstractRegistryException {
+public class TagInvalidException extends RegistryException {
 
     public TagInvalidException() {
     }
