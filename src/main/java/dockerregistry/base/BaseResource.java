@@ -9,9 +9,12 @@ import javax.ws.rs.core.Response;
 @Path("/v2")
 public class BaseResource {
 
+    static final String DOCKER_VERSION_HEADER = "Docker-Distribution-API-Version";
+    static final String DOCKER_REGISTRY_VERSION = "dockerregistry/2.0";
+
     @GET
     public Response getApiVersion() {
         Log.info("Get API version");
-        return Response.ok().header("Docker-Distribution-API-Version", "dockerregistry/2.0").build();
+        return Response.ok().header(DOCKER_VERSION_HEADER, DOCKER_REGISTRY_VERSION).build();
     }
 }

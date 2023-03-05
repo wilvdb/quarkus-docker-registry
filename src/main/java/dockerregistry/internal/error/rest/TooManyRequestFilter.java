@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,12 +21,18 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     private Map<String, AtomicInteger> ipCounter = new HashMap<>();
 
+    @Context
+    HttpServerRequest request;
+
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        var request = (HttpServerRequest) containerRequestContext.getRequest();
-        var counter = ipCounter.putIfAbsent(request.remoteAddress().hostAddress(), new AtomicInteger()).incrementAndGet();
+        ipCounter.putIfAbsent(request.remoteAddress().hostAddress(), new AtomicInteger());
+        var counter = ipCounter.computeIfPresent(request.remoteAddress().hostAddress(), (s, value) -> {
+            value.incrementAndGet();
+            return value;
+        });
 
-        if(counter > 100) {
+        if(counter.get() > 100) {
             throw new TooManyRequestException();
         }
     }
