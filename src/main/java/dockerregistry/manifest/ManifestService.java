@@ -1,5 +1,6 @@
 package dockerregistry.manifest;
 
+import dockerregistry.internal.error.exception.NameUnknownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dockerregistry.internal.error.exception.ManifestBlobUnknownException;
@@ -104,10 +105,10 @@ public class ManifestService {
     public String getMediaType(String name, String reference) {
         logger.debug("Get manifest media type for image {} with reference {}", name, reference);
 
-        var manifestPath = path.resolve(name + "." + reference + ".json");
-        try(var reader = Files.newBufferedReader(manifestPath); var parser = Json.createParser(reader)) {
+        var manifestPath = getManifestPath(name, reference);
+        try (var reader = Files.newBufferedReader(manifestPath); var parser = Json.createParser(reader)) {
 
-            var mediaType = parser.getObject().get("mediaType").toString();
+            var mediaType = parser.getObject().getString("mediaType");
             logger.debug("Manifest media type is {}", mediaType);
 
             return mediaType;
@@ -115,6 +116,31 @@ public class ManifestService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void checkExistence(String name, String reference) {
+        if(getManifestPath(name, reference) == null) {
+            throw new NameUnknownException();
+        }
+    }
+
+    public byte[] getContent(String name, String reference) {
+        logger.debug("Read manifest for image {} with reference {}", name, reference);
+
+        try {
+            return Files.readAllBytes(getManifestPath(name, reference));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path getManifestPath(String name, String reference) {
+        var hash = reference.split(":")[1];
+
+        var tagPath = path.resolve(name + "." + reference + ".json");
+        var hashPath = path.resolve(hash + ".json");
+
+        return Files.exists(tagPath) ? tagPath : Files.exists(hashPath) ? hashPath : null;
     }
 
 }

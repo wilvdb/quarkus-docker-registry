@@ -18,10 +18,17 @@ public class ManifestResource {
     ManifestService manifestService;
 
     @GET
-    public Response getManifest(@PathParam("name") String name, @PathParam("reference") String reference) {
+    //@Produces({ "application/octet-stream" })
+    public Response download(@PathParam("name") String name, @PathParam("reference") String reference) {
         logger.info("Get manifest with name {} and reference {}", name, reference);
 
-        return Response.ok().header("Docker-Content-Digest", reference).build();
+        manifestService.checkExistence(name, reference);
+
+        return Response.ok(manifestService.getContent(name, reference))
+                    .header("docker-content-digest", "sha256:" + manifestService.getSha256(name, reference))
+                    .header("content-type", manifestService.getMediaType(name, reference))
+                    .header("content-length", manifestService.getContentLength(name, reference))
+                    .build();
     }
 
     @PUT

@@ -27,6 +27,21 @@ public class BlobsResource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    @Path("/{digest}")
+    //@Produces({ "application/octet-stream" })
+    @GET
+    public Response download(@PathParam("name") String name, @PathParam("digest") String digest) {
+        if(layerService.layerExists(name, digest)) {
+            var length = layerService.getLayerSize(digest);
+
+            return Response.ok(layerService.getLayer(name, digest))
+                    .header("Content-Length", length)
+                    .build();
+        }
+
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
     @Path("/uploads")
     @POST
     public Response startUpload(@PathParam("name") String name, @QueryParam("digest") String digest) {

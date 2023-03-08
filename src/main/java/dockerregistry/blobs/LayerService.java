@@ -79,17 +79,33 @@ public class LayerService {
      */
     public void finishUpload(String uuid, String digest) {
         var hash = digest.split(":")[1];
-            var target = path.resolve(hash).toFile();
+        var target = path.resolve(hash).toFile();
 
-            logger.debug("Rename layer {} to {}", uuid, hash);
+        logger.debug("Rename layer {} to {}", uuid, hash);
 
-            path.resolve(uuid).toFile().renameTo(target);
-        }
+        path.resolve(uuid).toFile().renameTo(target);
+    }
 
     public void finishUpload(String uuid, String digest, String range, InputStream body) {
         uploadLayer(range, uuid, body);
 
         finishUpload(uuid, digest);
+    }
+
+    public byte[] getLayer(String name, String digest) {
+        logger.debug("Get layer {} for image {}", digest, name);
+
+        var hash = digest.split(":")[1];
+        var target =  path.resolve(hash);
+
+        try {
+            logger.debug("Read file {}", target);
+
+            return Files.readAllBytes(target);
+
+        } catch (IOException e) {
+            throw new BlobUploadInvalidException(e);
+        }
     }
 
 }
