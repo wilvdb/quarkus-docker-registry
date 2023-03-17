@@ -1,5 +1,6 @@
 package dockerregistry.manifest;
 
+import dockerregistry.internal.error.exception.ManifestInvalidException;
 import dockerregistry.internal.error.exception.NameUnknownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +115,7 @@ public class ManifestService {
             return mediaType;
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ManifestInvalidException(e);
         }
     }
 

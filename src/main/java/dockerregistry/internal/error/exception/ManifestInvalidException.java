@@ -5,6 +5,11 @@ import dockerregistry.internal.error.model.Error;
 public class ManifestInvalidException extends RegistryException {
 
     public ManifestInvalidException() {
+        super();
+    }
+
+    public ManifestInvalidException(Throwable throwable) {
+        super(throwable);
     }
 
     @Override
