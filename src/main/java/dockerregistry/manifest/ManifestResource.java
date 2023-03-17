@@ -12,8 +12,6 @@ import java.net.URI;
 @Path("/v2/{name}/manifests/{reference}")
 public class ManifestResource {
 
-    private static Logger logger = LoggerFactory.getLogger(ManifestResource.class);
-
     @Inject
     ManifestService manifestService;
 
@@ -23,14 +21,14 @@ public class ManifestResource {
         manifestService.checkExistence(name, reference);
 
         return Response.ok(manifestService.getContent(name, reference))
-                    .header("docker-content-digest", "sha256:" + manifestService.getSha256(name, reference))
-                    .header("content-type", manifestService.getMediaType(name, reference))
-                    .header("content-length", manifestService.getContentLength(name, reference))
+                    .header("Docker-Content-Digest", "sha256:" + manifestService.getSha256(name, reference))
+                    .header("Content-Type", manifestService.getMediaType(name, reference))
+                    .header("Content-Length", manifestService.getContentLength(name, reference))
                     .build();
     }
 
     @PUT
-    public Response saveManifest(@PathParam("name") String name, @PathParam("reference") String reference, InputStream body) {
+    public Response upload(@PathParam("name") String name, @PathParam("reference") String reference, InputStream body) {
         return Response.created(URI.create(String.format("/v2/%s/manifests/%s", name, reference)))
                 .header("Docker-Content-Digest", "sha256:" + manifestService.saveManifest(name, reference, body))
                 .build();
