@@ -20,8 +20,6 @@ public class ManifestResource {
     @GET
     //@Produces({ "application/octet-stream" })
     public Response download(@PathParam("name") String name, @PathParam("reference") String reference) {
-        logger.info("Get manifest with name {} and reference {}", name, reference);
-
         manifestService.checkExistence(name, reference);
 
         return Response.ok(manifestService.getContent(name, reference))

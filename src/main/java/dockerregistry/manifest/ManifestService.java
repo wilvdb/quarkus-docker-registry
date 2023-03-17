@@ -106,9 +106,9 @@ public class ManifestService {
         logger.debug("Get manifest media type for image {} with reference {}", name, reference);
 
         var manifestPath = getManifestPath(name, reference);
-        try (var reader = Files.newBufferedReader(manifestPath); var parser = Json.createParser(reader)) {
+        try (var reader = Files.newBufferedReader(manifestPath); var jsonReader = Json.createReader(reader)) {
 
-            var mediaType = parser.getObject().getString("mediaType");
+            var mediaType = jsonReader.readObject().getString("mediaType");
             logger.debug("Manifest media type is {}", mediaType);
 
             return mediaType;
@@ -119,13 +119,15 @@ public class ManifestService {
     }
 
     public void checkExistence(String name, String reference) {
+        logger.debug("Check existence manifest with reference {}", reference);
+
         if(getManifestPath(name, reference) == null) {
             throw new NameUnknownException();
         }
     }
 
     public byte[] getContent(String name, String reference) {
-        logger.debug("Read manifest for image {} with reference {}", name, reference);
+        logger.debug("Get manifest for image {} with reference {}", name, reference);
 
         try {
             return Files.readAllBytes(getManifestPath(name, reference));
@@ -135,12 +137,16 @@ public class ManifestService {
     }
 
     private Path getManifestPath(String name, String reference) {
-        var hash = reference.split(":")[1];
+        if(reference.contains(":")) {
+            var hash = reference.split(":")[1];
 
+
+            var hashPath = path.resolve(hash + ".json");
+            return Files.exists(hashPath) ? hashPath : null;
+        }
         var tagPath = path.resolve(name + "." + reference + ".json");
-        var hashPath = path.resolve(hash + ".json");
+        return Files.exists(tagPath) ? tagPath : null;
 
-        return Files.exists(tagPath) ? tagPath : Files.exists(hashPath) ? hashPath : null;
     }
 
 }
