@@ -1,5 +1,6 @@
 package dockerregistry.manifest;
 
+import dockerregistry.internal.error.exception.UnsupportedException;
 import dockerregistry.internal.rest.ResponseBuilder;
 
 import javax.inject.Inject;
@@ -43,5 +44,10 @@ public class ManifestResource {
         }
 
         return ResponseBuilder.notFound().build();
+    }
+
+    @DELETE
+    public Response delete(@PathParam("name") String name, @PathParam("reference") String reference) {
+        throw new UnsupportedException();
     }
 }

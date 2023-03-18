@@ -1,4 +1,4 @@
-package dockerregistry.blobs;
+package dockerregistry.blob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class BlobsService {
+public class BlobService {
 
-    private static final Logger logger = LoggerFactory.getLogger(BlobsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(BlobService.class);
 
     private Path path;
 

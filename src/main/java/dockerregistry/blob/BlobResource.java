@@ -1,5 +1,6 @@
-package dockerregistry.blobs;
+package dockerregistry.blob;
 
+import dockerregistry.internal.error.exception.UnsupportedException;
 import dockerregistry.internal.rest.ResponseBuilder;
 import org.jboss.resteasy.reactive.RestHeader;
 
@@ -9,18 +10,18 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 
 @Path("/v2/{name}/blobs")
-public class BlobsResource {
+public class BlobResource {
 
     @Inject
-    BlobsService blobsService;
+    BlobService blobService;
 
     @Path("/{digest}")
     @HEAD
     public Response exists(@PathParam("name") String name, @PathParam("digest") String digest) {
-        if(blobsService.layerExists(name, digest)) {
+        if(blobService.layerExists(name, digest)) {
             return ResponseBuilder.ok()
                     .dockerContentDigest(digest)
-                    .contentLength(blobsService.getLayerSize(digest))
+                    .contentLength(blobService.getLayerSize(digest))
                     .build();
         }
 
@@ -31,10 +32,10 @@ public class BlobsResource {
     //@Produces({ "application/octet-stream" })
     @GET
     public Response download(@PathParam("name") String name, @PathParam("digest") String digest) {
-        if(blobsService.layerExists(name, digest)) {
-            var length = blobsService.getLayerSize(digest);
+        if(blobService.layerExists(name, digest)) {
+            var length = blobService.getLayerSize(digest);
 
-            return ResponseBuilder.ok(blobsService.getLayer(name, digest))
+            return ResponseBuilder.ok(blobService.getLayer(name, digest))
                     .contentLength(length)
                     .build();
         }
@@ -42,10 +43,16 @@ public class BlobsResource {
         return ResponseBuilder.notFound().build();
     }
 
+    @Path("/{digest}")
+    @DELETE
+    public Response delete(@PathParam("name") String name, @PathParam("digest") String digest) {
+        throw new UnsupportedException();
+    }
+
     @Path("/uploads")
     @POST
     public Response startUpload(@PathParam("name") String name, @QueryParam("digest") String digest) {
-        var guid = blobsService.getUniqueId(name, digest);
+        var guid = blobService.getUniqueId(name, digest);
         return ResponseBuilder.accepted()
                 .location("/v2/" + name + "/blobs/uploads/" + guid)
                 .range(0)
@@ -57,7 +64,7 @@ public class BlobsResource {
     @Path("/uploads/{uuid}")
     @PATCH
     public Response upload(@PathParam("name") String name, @PathParam("uuid") String uuid, @RestHeader("Content-Range") String range, InputStream body) {
-        long position  = blobsService.uploadLayer(range, uuid, body);
+        long position  = blobService.uploadLayer(range, uuid, body);
 
         return ResponseBuilder.accepted()
             .location("/v2/" + name + "/blobs/uploads/" + uuid)
@@ -71,10 +78,10 @@ public class BlobsResource {
     @PUT
     public Response finishUpload(@PathParam("name") String name, @PathParam("uuid") String uuid, @QueryParam("digest") String digest, @RestHeader("Content-Range") String range, @RestHeader("Content-Length") long length, InputStream body) {
         if(length != 0) {
-            blobsService.finishUpload(uuid, digest, range, body);
+            blobService.finishUpload(uuid, digest, range, body);
         }
 
-        blobsService.finishUpload(uuid, digest);
+        blobService.finishUpload(uuid, digest);
 
         return ResponseBuilder.ok().dockerContentDigest(uuid).build();
     }
