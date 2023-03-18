@@ -1,5 +1,6 @@
 package dockerregistry.base;
 
+import dockerregistry.internal.rest.ResponseBuilder;
 import io.quarkus.logging.Log;
 
 import javax.ws.rs.GET;
@@ -15,6 +16,7 @@ public class BaseResource {
     @GET
     public Response getApiVersion() {
         Log.info("Get API version");
-        return Response.ok().header(DOCKER_VERSION_HEADER, DOCKER_REGISTRY_VERSION).build();
+
+        return ResponseBuilder.ok().dockerDistributionApiVersion().build();
     }
 }

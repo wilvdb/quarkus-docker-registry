@@ -1,5 +1,6 @@
 package dockerregistry.blobs;
 
+import dockerregistry.internal.rest.ResponseBuilder;
 import org.jboss.resteasy.reactive.RestHeader;
 
 import javax.inject.Inject;
@@ -11,60 +12,58 @@ import java.io.InputStream;
 public class BlobsResource {
 
     @Inject
-    LayerService layerService;
+    BlobsService blobsService;
 
     @Path("/{digest}")
     @HEAD
     public Response exists(@PathParam("name") String name, @PathParam("digest") String digest) {
-        if(layerService.layerExists(name, digest)) {
-            var length = layerService.getLayerSize(digest);
-            return Response.ok()
-                    .header("Docker-Content-Digest", digest)
-                    .header("Content-Length", length)
+        if(blobsService.layerExists(name, digest)) {
+            return ResponseBuilder.ok()
+                    .dockerContentDigest(digest)
+                    .contentLength(blobsService.getLayerSize(digest))
                     .build();
         }
 
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return ResponseBuilder.notFound().build();
     }
 
     @Path("/{digest}")
     //@Produces({ "application/octet-stream" })
     @GET
     public Response download(@PathParam("name") String name, @PathParam("digest") String digest) {
-        if(layerService.layerExists(name, digest)) {
-            var length = layerService.getLayerSize(digest);
+        if(blobsService.layerExists(name, digest)) {
+            var length = blobsService.getLayerSize(digest);
 
-            return Response.ok(layerService.getLayer(name, digest))
-                    .header("Content-Length", length)
+            return ResponseBuilder.ok(blobsService.getLayer(name, digest))
+                    .contentLength(length)
                     .build();
         }
 
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return ResponseBuilder.notFound().build();
     }
 
     @Path("/uploads")
     @POST
     public Response startUpload(@PathParam("name") String name, @QueryParam("digest") String digest) {
-        var builder = Response.accepted();
-
-        var guid = layerService.getUniqueId(name, digest);
-        builder.header("location", "/v2/" + name + "/blobs/uploads/" + guid);
-        builder.header("range", "0-0");
-        builder.header("content-length", "0");
-        builder.header("docker-upload-uuid", guid);
-        return builder.build();
+        var guid = blobsService.getUniqueId(name, digest);
+        return ResponseBuilder.accepted()
+                .location("/v2/" + name + "/blobs/uploads/" + guid)
+                .range(0)
+                .contentLength(0)
+                .dockerUploadUuid(guid)
+                .build();
     }
 
     @Path("/uploads/{uuid}")
     @PATCH
     public Response upload(@PathParam("name") String name, @PathParam("uuid") String uuid, @RestHeader("Content-Range") String range, InputStream body) {
-        long position  = layerService.uploadLayer(range, uuid, body);
+        long position  = blobsService.uploadLayer(range, uuid, body);
 
-        return Response.accepted()
-            .header("location", "/v2/" + name + "/blobs/uploads/" + uuid)
-            .header("range", "0-" + (position - 1))
-            .header("content-length", "0")
-            .header("docker-upload-uuid", uuid)
+        return ResponseBuilder.accepted()
+            .location("/v2/" + name + "/blobs/uploads/" + uuid)
+            .range(position - 1)
+            .contentLength(0)
+            .dockerUploadUuid(uuid)
             .build();
     }
 
@@ -72,11 +71,11 @@ public class BlobsResource {
     @PUT
     public Response finishUpload(@PathParam("name") String name, @PathParam("uuid") String uuid, @QueryParam("digest") String digest, @RestHeader("Content-Range") String range, @RestHeader("Content-Length") long length, InputStream body) {
         if(length != 0) {
-            layerService.finishUpload(uuid, digest, range, body);
+            blobsService.finishUpload(uuid, digest, range, body);
         }
 
-        layerService.finishUpload(uuid, digest);
+        blobsService.finishUpload(uuid, digest);
 
-        return Response.ok().header("Docker-Content-Digest", uuid).build();
+        return ResponseBuilder.ok().dockerContentDigest(uuid).build();
     }
 }

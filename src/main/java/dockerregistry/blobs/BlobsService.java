@@ -16,9 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class LayerService {
+public class BlobsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LayerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(BlobsService.class);
 
     private Path path;
 
