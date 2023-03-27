@@ -8,6 +8,7 @@ import dockerregistry.internal.error.exception.ManifestBlobUnknownException;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.Json;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,9 @@ public class ManifestService {
     private static final Logger logger = LoggerFactory.getLogger(ManifestService.class);
 
     private Path path;
+
+    @Inject
+    ManifestRepository repository;
 
     @PostConstruct
     protected void createRegistryDirectory() throws IOException {
