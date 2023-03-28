@@ -1,5 +1,6 @@
 package dockerregistry.manifest;
 
+import dockerregistry.internal.digest.DigestService;
 import dockerregistry.internal.error.exception.ManifestInvalidException;
 import dockerregistry.internal.error.exception.NameUnknownException;
 import org.slf4j.Logger;
@@ -25,6 +26,9 @@ public class ManifestService {
     private static final Logger logger = LoggerFactory.getLogger(ManifestService.class);
 
     private Path path;
+
+    @Inject
+    DigestService digestService;
 
     @Inject
     ManifestRepository repository;
@@ -68,34 +72,15 @@ public class ManifestService {
         logger.debug("Get manifest digest for image {} with reference {}", name, reference);
 
         try {
-            var messageInstance = MessageDigest.getInstance("SHA256");
             var tagPath = path.resolve(name + "." + reference + ".json");
 
-            var content  = Files.readAllBytes(tagPath);
-
-            return encodeHexString(messageInstance.digest(content));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            return digestService.getDigest(Files.readAllBytes(tagPath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    private String encodeHexString(byte[] byteArray) {
-        StringBuffer hexStringBuffer = new StringBuffer();
-        for (int i = 0; i < byteArray.length; i++) {
-            hexStringBuffer.append(byteToHex(byteArray[i]));
-        }
-        return hexStringBuffer.toString();
-    }
-
-    private String byteToHex(byte num) {
-        char[] hexDigits = new char[2];
-        hexDigits[0] = Character.forDigit((num >> 4) & 0xF, 16);
-        hexDigits[1] = Character.forDigit((num & 0xF), 16);
-        return new String(hexDigits);
-    }
 
     public long getContentLength(String name, String reference) {
         logger.debug("Get manifest content size for image {} with reference {}", name, reference);
