@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@NotNull
 @Pattern(regexp = "^[0-9]+-[0-9]+$")
 @Target({ PARAMETER })
 @Retention(RUNTIME)

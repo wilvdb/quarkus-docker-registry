@@ -29,6 +29,16 @@ public class ManifestEntity {
 
     private long length;
 
+    private String mediaType;
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
     private byte[] content;
 
     public long getId() {

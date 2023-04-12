@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.Optional;
 
 @Path("/v2/{name}/manifests/{reference}")
 public class ManifestResource {
@@ -30,22 +31,23 @@ public class ManifestResource {
 
     @PUT
     public Response upload(@Namespace @PathParam("name") String name, @Reference @PathParam("reference") String reference, InputStream body) {
+        var manifest = manifestService.saveManifest(name, reference, body);
+
         return ResponseBuilder.created(String.format("/v2/%s/manifests/%s", name, reference))
-                .dockerContentDigest("sha256:" + manifestService.saveManifest(name, reference, body))
+                .dockerContentDigest("sha256:" + manifest.digest())
                 .build();
     }
 
     @HEAD
     public Response existsManifest(@Namespace  @PathParam("name") String name, @Reference @PathParam("reference") String reference) {
-        if(manifestService.manifestExists(name, reference)) {
-            return ResponseBuilder.ok()
-                    .dockerContentDigest(manifestService.getSha256(name, reference))
-                    .contentLength(manifestService.getContentLength(name, reference))
-                    .contentType(manifestService.getMediaType(name, reference))
-                    .build();
-        }
-
-        return ResponseBuilder.notFound().build();
+        return manifestService.getManifest(name, reference)
+                .map(manifest -> ResponseBuilder.ok()
+                        .dockerContentDigest(manifest.digest())
+                        .contentLength(manifest.length())
+                        .contentType(manifest.mediaType())
+                        .build())
+                .or(() -> Optional.of(ResponseBuilder.notFound().build()))
+                .get();
     }
 
     @DELETE

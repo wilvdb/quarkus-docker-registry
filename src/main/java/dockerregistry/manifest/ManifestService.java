@@ -11,14 +11,14 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @ApplicationScoped
 public class ManifestService {
@@ -38,31 +38,40 @@ public class ManifestService {
         path = Files.createTempDirectory("tmpRegistry");
     }
 
-    public boolean manifestExists(String name, String reference) {
+    @Transactional
+    public Optional<Manifest> getManifest(String name, String reference) {
         logger.debug("Check manifest for image {} and reference {}", name, reference);
 
         var hash = reference.split(":")[0];
 
-        var tagPath = path.resolve(name + "." + reference + ".json").toFile();
-        var hashPath = path.resolve(hash + ".json").toFile();
-        return tagPath.exists() && hashPath.exists();
+        return repository.findByDigest(hash)
+                .or(() -> repository.findByTagAndName(name, reference))
+                .map(entity -> new Manifest(entity.getDigest(), entity.getName(), entity.getTag(), entity.getLength(), entity.getMediaType()));
 
     }
 
-    public String saveManifest(String name, String reference, InputStream input) {
+    @Transactional
+    public Manifest saveManifest(String name, String reference, InputStream input) {
         logger.debug("Save manifest for image {} and tag {}", name, reference);
 
         var tagPath = path.resolve(name + "." + reference + ".json");
 
+
         try (var outputChannel = Files.newByteChannel(tagPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
             logger.debug("Write manifest to file {}", tagPath);
-            outputChannel.write(ByteBuffer.wrap(input.readAllBytes()));
+            byte[] content = input.readAllBytes();
+            outputChannel.write(ByteBuffer.wrap(content));
 
-            var hash = getSha256(name, reference);
-            var hashPath = path.resolve(hash + ".json");
-            Files.copy(tagPath, hashPath);
+            var manifest = new ManifestEntity();
+            manifest.setName(name);
+            manifest.setTag(reference);
+            manifest.setDigest(digestService.getDigest(content));
+            manifest.setLength(Files.size(tagPath));
+            manifest.setMediaType(getMediaType(name, reference));
+            manifest.setContent(content);
+            repository.persist(manifest);
 
-            return hash;
+            return new Manifest(manifest.getDigest(), manifest.getName(), manifest.getTag(), manifest.getLength(), manifest.getMediaType());
         } catch (IOException e) {
             throw new ManifestBlobUnknownException(e);
         }
