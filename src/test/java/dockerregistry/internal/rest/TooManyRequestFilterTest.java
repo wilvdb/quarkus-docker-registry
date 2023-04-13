@@ -24,12 +24,16 @@ class TooManyRequestFilterTest {
 
     @BeforeEach
     void set_up() {
-        for(int i = 0; i < TooManyRequestFilter.LIMIT; i++) {
-            given()
-                    .when().get("/v2")
-                    .then()
-                    .statusCode(200);
-        }
+        with().pollDelay(TooManyRequestFilter.TIMESTAMP, TimeUnit.MILLISECONDS)
+                .await().untilAsserted(() -> {
+                    for(int i = 0; i < TooManyRequestFilter.LIMIT; i++) {
+                        given()
+                                .when().get("/v2")
+                                .then()
+                                .statusCode(200);
+                    }
+                });
+
     }
 
     @Test
@@ -46,7 +50,8 @@ class TooManyRequestFilterTest {
 
     @Test
     void many_request_after_timestamp() throws InterruptedException {
-        with().pollInterval(TooManyRequestFilter.TIMESTAMP, TimeUnit.MILLISECONDS).await().untilAsserted(() -> given()
+        with().pollDelay(TooManyRequestFilter.TIMESTAMP, TimeUnit.MILLISECONDS)
+                .await().untilAsserted(() -> given()
                 .when().get("/v2")
                 .then()
                 .statusCode(200));
