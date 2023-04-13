@@ -38,15 +38,15 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-//        ipCounter.putIfAbsent(request.remoteAddress().hostAddress(), new Hits());
-//        var hits = ipCounter.computeIfPresent(request.remoteAddress().hostAddress(), (s, value) -> {
-//            value.addHit();
-//            return value;
-//        });
-//
-//        if(hits.countHits() > LIMIT) {
-//            throw new TooManyRequestException();
-//        }
+        ipCounter.putIfAbsent(request.remoteAddress().hostAddress(), new Hits());
+        var hits = ipCounter.computeIfPresent(request.remoteAddress().hostAddress(), (s, value) -> {
+            value.addHit();
+            return value;
+        });
+
+        if(hits.countHits() > LIMIT) {
+            throw new TooManyRequestException();
+        }
 
     }
 
@@ -58,9 +58,7 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
             var now = Instant.now();
             hits.add(now);
 
-            hits = hits.stream()
-                    .filter(hit -> isAfter(now, hit))
-                    .toList();
+            hits.removeIf(hit -> isAfter(now, hit));
         }
 
         private boolean isAfter(Instant now, Instant hit) {
