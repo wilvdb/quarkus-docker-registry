@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,24 +28,27 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TooManyRequestFilter.class);
 
-    private static long TIMESTAMP = 5000l;
+    static long TIMESTAMP = 5000l;
 
     static int LIMIT = 100;
 
-    private Map<String, Hits> ipCounter = new HashMap<>();
+    private Map<String, Hits> ipCounter = new ConcurrentHashMap<>();
 
     @Context
     HttpServerRequest request;
 
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        ipCounter.putIfAbsent(request.remoteAddress().hostAddress(), new Hits());
-        var hits = ipCounter.computeIfPresent(request.remoteAddress().hostAddress(), (s, value) -> {
+    public void filter(ContainerRequestContext containerRequestContext) {
+        var address = request.remoteAddress().hostAddress();
+        ipCounter.putIfAbsent(address, new Hits());
+        var hits = ipCounter.computeIfPresent(address, (s, value) -> {
             value.addHit();
             return value;
         });
 
-        if(hits.countHits() > LIMIT) {
+        var count = hits.countHits();
+        if(count > LIMIT) {
+            logger.warn(String.format("Client %s exceed request limit %d", address, count));
             throw new TooManyRequestException();
         }
 
@@ -52,20 +56,19 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     static class Hits {
 
-        private List<Instant> hits = new ArrayList<>();
+        private final List<Instant> hits = new ArrayList<>();
 
         public void addHit() {
-            var now = Instant.now();
-            hits.add(now);
-
-            hits.removeIf(hit -> isAfter(now, hit));
+            hits.add(Instant.now());
         }
 
-        private boolean isAfter(Instant now, Instant hit) {
-            return now.minus(Duration.of(TIMESTAMP, ChronoUnit.MILLIS)).isAfter(hit);
+        private boolean isAfter(Instant hit) {
+            return Instant.now().minus(Duration.of(TIMESTAMP, ChronoUnit.MILLIS)).isAfter(hit);
         }
 
         public int countHits() {
+            hits.removeIf(this::isAfter);
+
             return hits.size();
         }
 
