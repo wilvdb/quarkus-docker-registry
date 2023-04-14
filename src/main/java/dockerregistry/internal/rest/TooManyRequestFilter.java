@@ -1,10 +1,12 @@
 package dockerregistry.internal.rest;
 
+import dockerregistry.internal.config.RegistryConfiguration;
 import dockerregistry.internal.error.exception.TooManyRequestException;
 import io.vertx.core.http.HttpServerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
@@ -28,9 +30,8 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TooManyRequestFilter.class);
 
-    static long TIMESTAMP = 5000l;
-
-    static int LIMIT = 100;
+    @Inject
+    RegistryConfiguration configuration;
 
     private Map<String, Hits> ipCounter = new ConcurrentHashMap<>();
 
@@ -39,22 +40,36 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {
+        cleanupHits();
+
         var address = request.remoteAddress().hostAddress();
-        ipCounter.putIfAbsent(address, new Hits());
+        ipCounter.putIfAbsent(address, new Hits(configuration.tooManyRequest().timestamp()));
         var hits = ipCounter.computeIfPresent(address, (s, value) -> {
             value.addHit();
             return value;
         });
 
         var count = hits.countHits();
-        if(count > LIMIT) {
+        if(count > configuration.tooManyRequest().limit()) {
             logger.warn(String.format("Client %s exceed request limit %d", address, count));
             throw new TooManyRequestException();
         }
 
     }
 
+    private void cleanupHits() {
+        ipCounter.forEach((ip, hits) -> hits.cleanup());
+
+        ipCounter.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+    }
+
     static class Hits {
+
+        private final Duration timestamp;
+
+        public Hits(Duration timestamp) {
+            this.timestamp = timestamp;
+        }
 
         private final List<Instant> hits = new ArrayList<>();
 
@@ -62,13 +77,19 @@ public class TooManyRequestFilter implements ContainerRequestFilter {
             hits.add(Instant.now());
         }
 
+        public void cleanup() {
+            hits.removeIf(this::isAfter);
+        }
+
+        public boolean isEmpty() {
+            return countHits() == 0;
+        }
+
         private boolean isAfter(Instant hit) {
-            return Instant.now().minus(Duration.of(TIMESTAMP, ChronoUnit.MILLIS)).isAfter(hit);
+            return Instant.now().minus(timestamp).isAfter(hit);
         }
 
         public int countHits() {
-            hits.removeIf(this::isAfter);
-
             return hits.size();
         }
 

@@ -1,5 +1,6 @@
 package dockerregistry.internal.rest;
 
+import dockerregistry.internal.config.RegistryConfiguration;
 import dockerregistry.internal.error.exception.ErrorIdentifier;
 import dockerregistry.internal.error.exception.TooManyRequestException;
 import io.quarkus.test.junit.QuarkusTest;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import javax.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
@@ -22,11 +24,14 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 class TooManyRequestFilterTest {
 
+    @Inject
+    RegistryConfiguration configuration;
+
     @BeforeEach
     void set_up() {
-        with().pollDelay(TooManyRequestFilter.TIMESTAMP, TimeUnit.MILLISECONDS)
+        with().pollDelay(configuration.tooManyRequest().timestamp())
                 .await().untilAsserted(() -> {
-                    for(int i = 0; i < TooManyRequestFilter.LIMIT; i++) {
+                    for(int i = 0; i < configuration.tooManyRequest().limit(); i++) {
                         given()
                                 .when().get("/v2")
                                 .then()
@@ -50,7 +55,7 @@ class TooManyRequestFilterTest {
 
     @Test
     void many_request_after_timestamp() throws InterruptedException {
-        with().pollDelay(TooManyRequestFilter.TIMESTAMP, TimeUnit.MILLISECONDS)
+        with().pollDelay(configuration.tooManyRequest().timestamp())
                 .await().untilAsserted(() -> given()
                 .when().get("/v2")
                 .then()
