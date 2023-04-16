@@ -1,10 +1,11 @@
 package dockerregistry.manifest;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
-import static io.quarkus.panache.common.Parameters.*;
+import jakarta.enterprise.context.ApplicationScoped;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Optional;
+
+import static io.quarkus.panache.common.Parameters.with;
 
 @ApplicationScoped
 public class ManifestRepository implements PanacheRepository<ManifestEntity> {

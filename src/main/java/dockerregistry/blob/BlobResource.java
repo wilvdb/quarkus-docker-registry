@@ -6,9 +6,9 @@ import dockerregistry.internal.validation.Namespace;
 import dockerregistry.internal.validation.Range;
 import org.jboss.resteasy.reactive.RestHeader;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 
 @Path("/v2/{name}/blobs")

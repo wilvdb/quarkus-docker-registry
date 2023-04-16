@@ -5,9 +5,9 @@ import dockerregistry.internal.rest.ResponseBuilder;
 import dockerregistry.internal.validation.Namespace;
 import dockerregistry.internal.validation.Reference;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.Optional;
 

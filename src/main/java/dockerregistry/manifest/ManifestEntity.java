@@ -1,8 +1,6 @@
 package dockerregistry.manifest;
 
-import org.hibernate.annotations.GeneratorType;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "manifests")

@@ -3,9 +3,9 @@ package dockerregistry.base;
 import dockerregistry.internal.rest.ResponseBuilder;
 import io.quarkus.logging.Log;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 
 @Path("/v2")
 public class BaseResource {

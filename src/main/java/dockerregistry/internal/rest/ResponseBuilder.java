@@ -1,6 +1,6 @@
 package dockerregistry.internal.rest;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Objects;
 
