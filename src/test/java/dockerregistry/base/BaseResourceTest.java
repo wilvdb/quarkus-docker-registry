@@ -1,21 +1,22 @@
 package dockerregistry.base;
 
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
 import org.junit.jupiter.api.Test;
 
-import static dockerregistry.base.BaseResource.DOCKER_REGISTRY_VERSION;
-import static dockerregistry.base.BaseResource.DOCKER_VERSION_HEADER;
+import static dockerregistry.internal.rest.ResponseBuilder.DOCKER_API_VERSION;
+import static dockerregistry.internal.rest.ResponseBuilder.DOCKER_API_VERSION_HEADER;
 import static io.restassured.RestAssured.given;
 
 @QuarkusTest
+@TestHTTPEndpoint(BaseResource.class)
 class BaseResourceTest {
 
     @Test
     void base() {
-        given().get("/v2")
+        given().get()
                 .then()
                 .statusCode(200)
-                .header(DOCKER_VERSION_HEADER, DOCKER_REGISTRY_VERSION);
+                .header(DOCKER_API_VERSION_HEADER, DOCKER_API_VERSION);
     }
 }

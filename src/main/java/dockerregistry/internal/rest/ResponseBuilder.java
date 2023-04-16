@@ -6,6 +6,8 @@ import java.util.Objects;
 
 public class ResponseBuilder {
 
+    public static final String DOCKER_API_VERSION_HEADER = "Docker-Distribution-API-Version";
+    public static final String DOCKER_API_VERSION = "dockerregistry/2.0";
     private Response.ResponseBuilder builder;
 
     private ResponseBuilder() {
@@ -79,7 +81,7 @@ public class ResponseBuilder {
     }
 
     public ResponseBuilder dockerDistributionApiVersion() {
-        builder.header("Docker-Distribution-API-Version", "dockerregistry/2.0");
+        builder.header(DOCKER_API_VERSION_HEADER, DOCKER_API_VERSION);
 
         return this;
     }
