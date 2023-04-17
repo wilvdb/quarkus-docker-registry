@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -63,6 +64,7 @@ public class ManifestService {
             outputChannel.write(ByteBuffer.wrap(content));
 
             var manifest = new ManifestEntity();
+            manifest.setCreatedAt(LocalDateTime.now());
             manifest.setName(name);
             manifest.setTag(reference);
             manifest.setDigest(digestService.getDigest(content));

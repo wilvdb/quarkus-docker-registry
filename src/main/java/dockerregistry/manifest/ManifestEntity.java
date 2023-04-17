@@ -1,6 +1,10 @@
 package dockerregistry.manifest;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "manifests")
@@ -21,12 +25,25 @@ public class ManifestEntity {
         this.name = name;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     private String digest;
 
     private String tag;
 
     private long length;
 
+    @Column(name = "media_type")
     private String mediaType;
 
     public String getMediaType() {
@@ -37,6 +54,8 @@ public class ManifestEntity {
         this.mediaType = mediaType;
     }
 
+    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
     private byte[] content;
 
     public long getId() {
