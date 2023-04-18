@@ -5,6 +5,7 @@ import dockerregistry.internal.rest.ResponseBuilder;
 import dockerregistry.internal.validation.Namespace;
 import dockerregistry.internal.validation.Reference;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -17,8 +18,8 @@ public class ManifestResource {
     @Inject
     ManifestService manifestService;
 
+    @RolesAllowed({"read"})
     @GET
-    //@Produces({ "application/octet-stream" })
     public Response download(@Namespace @PathParam("name") String name, @Reference @PathParam("reference") String reference) {
         manifestService.checkExistence(name, reference);
 
@@ -29,6 +30,7 @@ public class ManifestResource {
                     .build();
     }
 
+    @RolesAllowed({"write"})
     @PUT
     public Response upload(@Namespace @PathParam("name") String name, @Reference @PathParam("reference") String reference, InputStream body) {
         var manifest = manifestService.saveManifest(name, reference, body);
@@ -38,6 +40,7 @@ public class ManifestResource {
                 .build();
     }
 
+    @RolesAllowed({"read"})
     @HEAD
     public Response existsManifest(@Namespace  @PathParam("name") String name, @Reference @PathParam("reference") String reference) {
         return manifestService.getManifest(name, reference)
@@ -50,6 +53,7 @@ public class ManifestResource {
                 .get();
     }
 
+    @RolesAllowed({"write"})
     @DELETE
     public Response delete(@Namespace @PathParam("name") String name, @Reference @PathParam("reference") String reference) {
         throw new UnsupportedException();

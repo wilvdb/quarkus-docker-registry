@@ -4,6 +4,7 @@ import dockerregistry.internal.error.exception.UnsupportedException;
 import dockerregistry.internal.rest.ResponseBuilder;
 import dockerregistry.internal.validation.Namespace;
 import dockerregistry.internal.validation.Range;
+import jakarta.annotation.security.RolesAllowed;
 import org.jboss.resteasy.reactive.RestHeader;
 
 import jakarta.inject.Inject;
@@ -17,6 +18,7 @@ public class BlobResource {
     @Inject
     BlobService blobService;
 
+    @RolesAllowed({"read"})
     @Path("/{digest}")
     @HEAD
     public Response exists(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
@@ -30,8 +32,8 @@ public class BlobResource {
         return ResponseBuilder.notFound().build();
     }
 
+    @RolesAllowed({"read"})
     @Path("/{digest}")
-    //@Produces({ "application/octet-stream" })
     @GET
     public Response download(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
         if(blobService.layerExists(name, digest)) {
@@ -45,12 +47,14 @@ public class BlobResource {
         return ResponseBuilder.notFound().build();
     }
 
+    @RolesAllowed({"write"})
     @Path("/{digest}")
     @DELETE
     public Response delete(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
         throw new UnsupportedException();
     }
 
+    @RolesAllowed({"write"})
     @Path("/uploads")
     @POST
     public Response startUpload(@Namespace @PathParam("name") String name, @QueryParam("digest") String digest) {
@@ -63,6 +67,7 @@ public class BlobResource {
                 .build();
     }
 
+    @RolesAllowed({"write"})
     @Path("/uploads/{uuid}")
     @PATCH
     public Response upload(@Namespace @PathParam("name") String name, @PathParam("uuid") String uuid, @Range @RestHeader("Content-Range") String range, InputStream body) {
@@ -76,6 +81,7 @@ public class BlobResource {
             .build();
     }
 
+    @RolesAllowed({"write"})
     @Path("/uploads/{uuid}")
     @PUT
     public Response finishUpload(@Namespace @PathParam("name") String name, @PathParam("uuid") String uuid, @QueryParam("digest") String digest, @Range @RestHeader("Content-Range") String range, @RestHeader("Content-Length") long length, InputStream body) {
