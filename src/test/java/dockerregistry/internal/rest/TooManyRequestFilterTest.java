@@ -4,6 +4,7 @@ import dockerregistry.internal.config.RegistryConfiguration;
 import dockerregistry.internal.error.exception.ErrorIdentifier;
 import dockerregistry.internal.error.exception.TooManyRequestException;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.matcher.RestAssuredMatchers;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Assertions;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
+@TestSecurity(authorizationEnabled = false)
 class TooManyRequestFilterTest {
 
     @Inject
