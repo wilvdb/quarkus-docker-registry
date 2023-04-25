@@ -1,19 +1,22 @@
 package dockerregistry.blob;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import dockerregistry.internal.error.exception.BlobUploadInvalidException;
-
+import dockerregistry.internal.error.exception.BlobUploadUnkownException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @ApplicationScoped
 public class BlobService {
@@ -22,13 +25,24 @@ public class BlobService {
 
     private Path path;
 
+    @Inject
+    BlobRepository blobRepository;
+
     @PostConstruct
     protected void createRegistryDirectory() throws IOException {
         path = Files.createTempDirectory("tmpRegistry");
     }
 
+    @Transactional
     public String getUniqueId(String name, String digest) {
-        return UUID.randomUUID().toString();
+        var blob = new BlobEntity();
+        blob.setCreatedAt(LocalDateTime.now());
+        blob.setName(name);
+        blob.setDigest(digest);
+
+        blobRepository.persist(blob);
+
+        return Long.toString(blob.getId());
     }
 
     public long getLayerSize(String digest) {
@@ -40,12 +54,13 @@ public class BlobService {
         }
     }
 
+    @Transactional
     public boolean layerExists(String name, String digest) {
         logger.debug("Check if image {} with digest {} is present", name, digest);
 
         var hash = digest.split(":")[1];
 
-        return path.resolve(hash).toFile().exists();
+        return blobRepository.findByDigest(hash).isPresent();
     }
 
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
@@ -73,19 +88,25 @@ public class BlobService {
     }
 
     /**
-     * TODO read inputstream if there is one
      * @param uuid
      * @param digest
      */
+    @Transactional
     public void finishUpload(String uuid, String digest) {
         var hash = digest.split(":")[1];
         var target = path.resolve(hash).toFile();
+
+        var blob = blobRepository.findByIdOptional(Long.parseLong(uuid))
+                .orElseThrow(BlobUploadUnkownException::new);
+
+        blob.setDigest(hash);
 
         logger.debug("Rename layer {} to {}", uuid, hash);
 
         path.resolve(uuid).toFile().renameTo(target);
     }
 
+    @Transactional
     public void finishUpload(String uuid, String digest, String range, InputStream body) {
         uploadLayer(range, uuid, body);
 

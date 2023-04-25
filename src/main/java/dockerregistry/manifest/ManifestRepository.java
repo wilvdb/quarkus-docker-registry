@@ -11,16 +11,12 @@ import static io.quarkus.panache.common.Parameters.with;
 public class ManifestRepository implements PanacheRepository<ManifestEntity> {
 
     public Optional<ManifestEntity> findByDigest(String digest) {
-        return find("select m from ManifestEntity as m where digest = :digest",
-                with("digest", digest)
-        ).stream()
-                .findFirst();
+        return find("#ManifestEntity.findByDigest", with("digest", digest)).
+                firstResultOptional();
     }
 
     public Optional<ManifestEntity> findByTagAndName(String name, String tag) {
-        return find("select m from ManifestEntity as m where tag = :tag and name = :name",
-                with("tag", tag).and("name", name)
-        ).stream()
-                .findFirst();
+        return find("#ManifestEntity.findByTagAndName", with("tag", tag).and("name", name)).
+                firstResultOptional();
     }
 }

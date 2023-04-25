@@ -8,11 +8,19 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "manifests")
+@NamedQuery(
+        name = "ManifestEntity.findByDigest",
+        query = "select m from ManifestEntity as m where digest = :digest"
+)
+@NamedQuery(
+        name = "ManifestEntity.findByTagAndName",
+        query = "select m from ManifestEntity as m where tag = :tag and name = :name"
+)
 public class ManifestEntity {
 
     @Id
     @SequenceGenerator(name = "manifest_gen", sequenceName = "manifest_seq")
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "manifest_gen")
     private long id;
 
     private String name;
