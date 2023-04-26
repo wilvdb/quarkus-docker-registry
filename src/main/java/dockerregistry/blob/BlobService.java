@@ -1,20 +1,14 @@
 package dockerregistry.blob;
 
-import dockerregistry.internal.error.exception.BlobUploadInvalidException;
 import dockerregistry.internal.error.exception.BlobUploadUnkownException;
-import jakarta.annotation.PostConstruct;
+import dockerregistry.internal.storage.FileSystemStorage;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,15 +18,11 @@ public class BlobService {
 
     private static final Logger logger = LoggerFactory.getLogger(BlobService.class);
 
-    private Path path;
+    @Inject
+    FileSystemStorage storage;
 
     @Inject
     BlobRepository blobRepository;
-
-    @PostConstruct
-    protected void createRegistryDirectory() throws IOException {
-        path = Files.createTempDirectory("tmpRegistry");
-    }
 
     @Transactional
     public Blob createBlob(String name, String digest) {
@@ -47,13 +37,7 @@ public class BlobService {
         return new Blob(blob.getUuid(), blob.getName(), blob.getDigest(), blob.getLength());
     }
 
-    private long getLayerSize(String hash) {
-        try {
-            return Files.size(path.resolve(hash));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     @Transactional
     public Optional<Blob> layerExists(String name, String digest) {
@@ -66,26 +50,7 @@ public class BlobService {
     }
 
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
-        logger.debug("Upload blob from range {} UUID {}", range, uuid);
-
-        var start = Optional.ofNullable(range)
-                .map(r -> r.split("-")[0])
-                .map(Long::parseLong)
-                .orElse(0l);
-
-        var filePath = path.resolve(uuid);
-
-        try (var outputChannel = Files.newByteChannel(filePath, StandardOpenOption.APPEND, StandardOpenOption.CREATE).position(start)) {
-            logger.debug("Write to file {}", filePath);
-            outputChannel.write(ByteBuffer.wrap(inputStream.readAllBytes()));
-
-            logger.debug("finish upload the layer");
-
-            return outputChannel.position();
-
-        } catch (IOException e) {
-            throw new BlobUploadInvalidException(e);
-        }
+        return storage.uploadLayer(range, uuid, inputStream);
 
     }
 
@@ -96,17 +61,16 @@ public class BlobService {
     @Transactional
     public void finishUpload(String uuid, String digest) {
         var hash = digest.split(":")[1];
-        var target = path.resolve(hash).toFile();
 
         var blob = blobRepository.findByUuid(uuid)
                 .orElseThrow(BlobUploadUnkownException::new);
 
         blob.setDigest(hash);
-        blob.setLength(getLayerSize(uuid));
+        blob.setLength(storage.getLayerSize(uuid));
 
         logger.debug("Rename layer {} to {}", uuid, hash);
 
-        path.resolve(uuid).toFile().renameTo(target);
+        storage.finishUpload(uuid, digest);
     }
 
     @Transactional
@@ -117,19 +81,7 @@ public class BlobService {
     }
 
     public byte[] getLayer(String name, String digest) {
-        logger.debug("Get layer {} for image {}", digest, name);
-
-        var hash = digest.split(":")[1];
-        var target =  path.resolve(hash);
-
-        try {
-            logger.debug("Read file {}", target);
-
-            return Files.readAllBytes(target);
-
-        } catch (IOException e) {
-            throw new BlobUploadInvalidException(e);
-        }
+        return storage.getLayer(name, digest);
     }
 
 }
