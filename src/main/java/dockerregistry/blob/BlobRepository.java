@@ -12,4 +12,8 @@ public class BlobRepository implements PanacheRepository<BlobEntity> {
     public Optional<BlobEntity> findByDigest(String digest) {
         return find("#BlobEntity.findByDigest", Parameters.with("digest", digest)).singleResultOptional();
     }
+
+    public Optional<BlobEntity> findByUuid(String uuid) {
+        return find("#BlobEntity.findByUuid", Parameters.with("uuid", uuid)).singleResultOptional();
+    }
 }

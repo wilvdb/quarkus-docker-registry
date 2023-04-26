@@ -22,29 +22,24 @@ public class BlobResource {
     @Path("/{digest}")
     @HEAD
     public Response exists(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
-        if(blobService.layerExists(name, digest)) {
-            return ResponseBuilder.ok()
-                    .dockerContentDigest(digest)
-                    .contentLength(blobService.getLayerSize(digest))
-                    .build();
-        }
-
-        return ResponseBuilder.notFound().build();
+        return blobService.layerExists(name, digest)
+                .map(blob -> ResponseBuilder.ok()
+                        .dockerContentDigest(blob.digest())
+                        .contentLength(blob.length())
+                        .build())
+                .orElseGet(() -> ResponseBuilder.notFound().build());
     }
 
     @RolesAllowed({"read"})
     @Path("/{digest}")
     @GET
     public Response download(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
-        if(blobService.layerExists(name, digest)) {
-            var length = blobService.getLayerSize(digest);
-
-            return ResponseBuilder.ok(blobService.getLayer(name, digest))
-                    .contentLength(length)
-                    .build();
-        }
-
-        return ResponseBuilder.notFound().build();
+        return blobService.layerExists(name, digest)
+                .map(blob -> ResponseBuilder.ok(blobService.getLayer(name, digest))
+                        .dockerContentDigest(blob.digest())
+                        .contentLength(blob.length())
+                        .build())
+                .orElseGet(() -> ResponseBuilder.notFound().build());
     }
 
     @RolesAllowed({"write"})
@@ -58,12 +53,12 @@ public class BlobResource {
     @Path("/uploads")
     @POST
     public Response startUpload(@Namespace @PathParam("name") String name, @QueryParam("digest") String digest) {
-        var guid = blobService.getUniqueId(name, digest);
+        var blob = blobService.createBlob(name, digest);
         return ResponseBuilder.accepted()
-                .location("/v2/" + name + "/blobs/uploads/" + guid)
+                .location("/v2/" + name + "/blobs/uploads/" + blob.uuid())
                 .range(0)
                 .contentLength(0)
-                .dockerUploadUuid(guid)
+                .dockerUploadUuid(blob.uuid())
                 .build();
     }
 

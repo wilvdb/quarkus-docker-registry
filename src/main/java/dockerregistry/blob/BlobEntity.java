@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
         name = "BlobEntity.findByDigest",
         query = "select b from BlobEntity as b where b.digest = :digest"
 )
+@NamedQuery(
+        name = "BlobEntity.findByUuid",
+        query = "select b from BlobEntity as b where b.uuid = :uuid"
+)
 public class BlobEntity {
 
     @Id
@@ -25,6 +29,27 @@ public class BlobEntity {
 
     @Column(nullable = false)
     private String name;
+
+    private long length;
+
+    @Column(nullable = false)
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
 
     public long getId() {
         return id;

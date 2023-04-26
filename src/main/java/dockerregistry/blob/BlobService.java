@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class BlobService {
@@ -34,19 +35,19 @@ public class BlobService {
     }
 
     @Transactional
-    public String getUniqueId(String name, String digest) {
+    public Blob createBlob(String name, String digest) {
         var blob = new BlobEntity();
         blob.setCreatedAt(LocalDateTime.now());
         blob.setName(name);
         blob.setDigest(digest);
+        blob.setUuid(UUID.randomUUID().toString());
 
         blobRepository.persist(blob);
 
-        return Long.toString(blob.getId());
+        return new Blob(blob.getUuid(), blob.getName(), blob.getDigest(), blob.getLength());
     }
 
-    public long getLayerSize(String digest) {
-        var hash = digest.split(":")[1];
+    private long getLayerSize(String hash) {
         try {
             return Files.size(path.resolve(hash));
         } catch (IOException e) {
@@ -55,12 +56,13 @@ public class BlobService {
     }
 
     @Transactional
-    public boolean layerExists(String name, String digest) {
+    public Optional<Blob> layerExists(String name, String digest) {
         logger.debug("Check if image {} with digest {} is present", name, digest);
 
         var hash = digest.split(":")[1];
 
-        return blobRepository.findByDigest(hash).isPresent();
+        return blobRepository.findByDigest(hash).
+                map(entity -> new Blob(entity.getUuid(), entity.getName(), entity.getDigest(), entity.getLength()));
     }
 
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
@@ -96,10 +98,11 @@ public class BlobService {
         var hash = digest.split(":")[1];
         var target = path.resolve(hash).toFile();
 
-        var blob = blobRepository.findByIdOptional(Long.parseLong(uuid))
+        var blob = blobRepository.findByUuid(uuid)
                 .orElseThrow(BlobUploadUnkownException::new);
 
         blob.setDigest(hash);
+        blob.setLength(getLayerSize(uuid));
 
         logger.debug("Rename layer {} to {}", uuid, hash);
 
