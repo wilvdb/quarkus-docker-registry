@@ -34,8 +34,8 @@ public class BlobResource {
     @Path("/{digest}")
     @GET
     public Response download(@Namespace @PathParam("name") String name, @PathParam("digest") String digest) {
-        return blobService.layerExists(name, digest)
-                .map(blob -> ResponseBuilder.ok(blobService.getLayer(name, digest))
+        return blobService.getLayer(name, digest)
+                .map(blob -> ResponseBuilder.ok(blob.content())
                         .dockerContentDigest(blob.digest())
                         .contentLength(blob.length())
                         .build())

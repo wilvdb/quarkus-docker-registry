@@ -37,7 +37,7 @@ public class ManifestResource {
         var manifest = manifestService.saveManifest(name, reference, body);
 
         return ResponseBuilder.created(String.format("/v2/%s/manifests/%s", name, reference))
-                .dockerContentDigest("sha256:" + manifest.digest())
+                .dockerContentDigest(manifest.digest())
                 .build();
     }
 

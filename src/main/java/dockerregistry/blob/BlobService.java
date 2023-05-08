@@ -34,7 +34,7 @@ public class BlobService {
 
         blobRepository.persist(blob);
 
-        return new Blob(blob.getUuid(), blob.getName(), blob.getDigest(), blob.getLength());
+        return new Blob(blob.getUuid(), blob.getName(), blob.getDigest(), blob.getLength(), null);
     }
 
 
@@ -46,7 +46,7 @@ public class BlobService {
         var hash = digest.split(":")[1];
 
         return blobRepository.findByDigest(hash).
-                map(entity -> new Blob(entity.getUuid(), entity.getName(), entity.getDigest(), entity.getLength()));
+                map(entity -> new Blob(entity.getUuid(), entity.getName(), entity.getDigest(), entity.getLength(), null));
     }
 
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
@@ -80,8 +80,10 @@ public class BlobService {
         finishUpload(uuid, digest);
     }
 
-    public byte[] getLayer(String name, String digest) {
-        return storage.getLayer(name, digest);
+    @Transactional
+    public Optional<Blob> getLayer(String name, String digest) {
+        return layerExists(name, digest)
+                .map(blob -> Blob.from(blob).withContent(storage.getLayer(name, digest)).build());
     }
 
 }

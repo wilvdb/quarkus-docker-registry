@@ -7,11 +7,13 @@ import java.security.MessageDigest;
 @ApplicationScoped
 public class DigestService {
 
+    private static final String ALGORITHM = "sha256";
+
     @Inject
     MessageDigest messageDigest;
 
     public String getDigest(byte[] content) {
-        return encodeHexString(messageDigest.digest(content));
+        return ALGORITHM + ":" + encodeHexString(messageDigest.digest(content));
     }
 
     private String encodeHexString(byte[] byteArray) {
