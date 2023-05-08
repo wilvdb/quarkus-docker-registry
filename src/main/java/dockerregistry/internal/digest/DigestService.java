@@ -1,20 +1,13 @@
 package dockerregistry.internal.digest;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import java.security.MessageDigest;
-
-@ApplicationScoped
-public class DigestService {
-
-    private static final String ALGORITHM = "sha256";
-
-    @Inject
-    MessageDigest messageDigest;
-
+public abstract class DigestService {
     public String getDigest(byte[] content) {
-        return ALGORITHM + ":" + encodeHexString(messageDigest.digest(content));
+        return algorithm() + ":" + encodeHexString(digest(content));
     }
+
+    protected abstract byte[] digest(byte[] content);
+
+    protected abstract String algorithm();
 
     private String encodeHexString(byte[] byteArray) {
         StringBuffer hexStringBuffer = new StringBuffer();

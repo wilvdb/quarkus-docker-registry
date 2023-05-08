@@ -5,6 +5,7 @@ import dockerregistry.internal.error.exception.ManifestBlobUnknownException;
 import dockerregistry.internal.error.exception.ManifestInvalidException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.json.Json;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class ManifestService {
     private static final Logger logger = LoggerFactory.getLogger(ManifestService.class);
 
     @Inject
+    @Named("sha256DigestService")
     DigestService digestService;
 
     @Inject
