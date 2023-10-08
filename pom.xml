@@ -32,9 +32,12 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <modules>
         <module>registry</module>
+        <module>storage-extension</module>
     </modules>
+
     <profiles>
         <profile>
             <id>native</id>
