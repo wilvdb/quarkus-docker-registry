@@ -7,3 +7,12 @@ services:
       - POSTGRES_USER=postgresql
       - POSTGRES_PASSWORD=postgresql
       - POSTGRES_HOST_AUTH_METHOD=trust
+
+  vault:
+    image: vault:1.6.0
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR=http://localhost:8200
