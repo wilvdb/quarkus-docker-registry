@@ -15,13 +15,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 @ApplicationScoped
-public class FileSystemStorage {
+public class FileSystemStorage implements Storage {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSystemStorage.class);
 
     @Inject
     Path root;
 
+    @Override
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
         logger.debug("Upload blob from range {} UUID {}", range, uuid);
 
@@ -46,6 +47,7 @@ public class FileSystemStorage {
 
     }
 
+    @Override
     public byte[] getLayer(String name, String digest) {
         logger.debug("Get layer {} for image {}", digest, name);
 
@@ -62,6 +64,7 @@ public class FileSystemStorage {
         }
     }
 
+    @Override
     public void finishUpload(String uuid, String digest) {
         var hash = digest.split(":")[1];
         var target = root.resolve(hash).toFile();
@@ -71,6 +74,7 @@ public class FileSystemStorage {
         root.resolve(uuid).toFile().renameTo(target);
     }
 
+    @Override
     public long getLayerSize(String hash) {
         try {
             return Files.size(root.resolve(hash));
