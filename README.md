@@ -36,5 +36,6 @@ To pull or push images, they should have this form : `registry.me:8080/alpine:la
 
 * Switch to Gradle
 * Bum to Quarkus 3.5.0
+* Vault integration
 * Automate build (CircleCI, Travis, Github action)
 * Native build
