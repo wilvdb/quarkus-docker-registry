@@ -37,6 +37,7 @@
     <modules>
         <module>registry</module>
         <module>storage-extension</module>
+        <module>filesystem-storage-extension</module>
     </modules>
 
     <profiles>
