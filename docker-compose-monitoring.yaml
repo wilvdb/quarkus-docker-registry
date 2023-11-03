@@ -1,0 +1,49 @@
+version: "3"
+services:
+
+  # And put them in an OTEL collector pipeline...
+  otel-collector:
+    image: artifactory.ctie.etat.lu:443/docker/otel/opentelemetry-collector:0.61.0
+    command: [ "--config=/etc/otel-collector.yaml" ]
+    volumes:
+      - ./config/monitoring/otel-collector.yaml:/etc/otel-collector.yaml
+    ports:
+      - "7000:4317"
+      - "7001:4318"
+
+  # To eventually offload to Tempo...
+  tempo:
+    image: artifactory.ctie.etat.lu:443/docker/grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./config/monitoring/tempo.yaml:/etc/tempo.yaml
+      - ./tempo-data:/tmp/tempo
+    ports:
+      - "3200"   # tempo
+      - "4317"  # otlp grpc
+      - "4318"  # otlp http
+
+  prometheus:
+    image: artifactory.ctie.etat.lu:443/docker/prom/prometheus:v2.44.0
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --log.level=debug
+    volumes:
+      - ./config/monitoring/prometheus.yaml:/etc/prometheus.yaml
+    ports:
+      - "9090"
+
+  grafana:
+    image: artifactory.ctie.etat.lu:443/docker/grafana/grafana:9.4.3
+    volumes:
+      - ./config/monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config/monitoring/grafana.ini:/etc/grafana/grafana.ini
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3600:3000"
