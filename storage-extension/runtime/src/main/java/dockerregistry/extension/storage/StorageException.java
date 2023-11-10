@@ -1,4 +1,8 @@
 package dockerregistry.extension.storage;
 
-public class StorageException extends RuntimeException {
+public abstract class StorageException extends RuntimeException {
+
+    public StorageException(Throwable cause) {
+        super(cause);
+    }
 }
