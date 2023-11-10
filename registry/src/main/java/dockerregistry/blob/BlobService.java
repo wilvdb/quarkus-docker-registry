@@ -19,7 +19,7 @@ public class BlobService {
     private static final Logger logger = LoggerFactory.getLogger(BlobService.class);
 
     @Inject
-    FileSystemStorage storage;
+    Storage storage;
 
     @Inject
     BlobRepository blobRepository;

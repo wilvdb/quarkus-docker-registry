@@ -1,0 +1,12 @@
+---
+name: "Storage"
+artifact: ${project.groupId}:${project.artifactId}:${project.version}
+metadata:
+  keywords:
+    - "storage"
+  categories:
+    - "storage"
+    - "data"
+  status: "preview"
+  config:
+    - "registry.storage."

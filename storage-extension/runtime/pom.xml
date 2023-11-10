@@ -6,20 +6,13 @@
 
     <parent>
         <groupId>dockerregistry</groupId>
-        <artifactId>storage-extension</artifactId>
+        <artifactId>storage-extension-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>storage-extension-runtime</artifactId>
     <name>Storage Extension - Runtime</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-arc</artifactId>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>

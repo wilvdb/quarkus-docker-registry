@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>dockerregistry</groupId>
-        <artifactId>filesystem-storage-extension</artifactId>
+        <artifactId>filesystem-storage-extension-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -19,14 +19,14 @@
             <artifactId>quarkus-arc-deployment</artifactId>
         </dependency>
         <dependency>
-            <groupId>${parent.groupId}</groupId>
-            <artifactId>${parent.artifactId}</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5-internal</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dockerregistry</groupId>
+            <artifactId>filesystem-storage-extension-runtime</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
