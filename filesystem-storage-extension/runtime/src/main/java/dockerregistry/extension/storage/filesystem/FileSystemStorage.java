@@ -1,9 +1,8 @@
 package dockerregistry.extension.storage.filesystem;
 
 import dockerregistry.extension.storage.Storage;
-import dockerregistry.internal.error.exception.BlobUploadInvalidException;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import dockerregistry.extension.storage.UnknownException;
+import dockerregistry.extension.storage.UploadInvalidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class FileSystemStorage implements Storage {
     }
 
     @Override
-    public long uploadLayer(String range, String uuid, InputStream inputStream) {
+    public long upload(String range, String uuid, InputStream inputStream) {
         logger.debug("Upload blob from range {} UUID {}", range, uuid);
 
         var start = Optional.ofNullable(range)
@@ -45,13 +44,13 @@ public class FileSystemStorage implements Storage {
             return outputChannel.position();
 
         } catch (IOException e) {
-            throw new BlobUploadInvalidException(e);
+            throw new UploadInvalidException(e);
         }
 
     }
 
     @Override
-    public byte[] getLayer(String name, String digest) {
+    public byte[] download(String name, String digest) {
         logger.debug("Get layer {} for image {}", digest, name);
 
         var hash = digest.split(":")[1];
@@ -63,7 +62,7 @@ public class FileSystemStorage implements Storage {
             return Files.readAllBytes(target);
 
         } catch (IOException e) {
-            throw new BlobUploadInvalidException(e);
+            throw new UnknownException(e);
         }
     }
 
@@ -82,7 +81,7 @@ public class FileSystemStorage implements Storage {
         try {
             return Files.size(root.resolve(hash));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnknownException(e);
         }
     }
 }

@@ -14,6 +14,13 @@
     <artifactId>storage-extension-runtime</artifactId>
     <name>Storage Extension - Runtime</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -27,7 +34,7 @@
                             <goal>extension-descriptor</goal>
                         </goals>
                         <configuration>
-                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}
+                            <deployment>${project.groupId}:storage-extension-deployment:${project.version}
                             </deployment>
                         </configuration>
                     </execution>
