@@ -15,13 +15,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
-@ApplicationScoped
 public class FileSystemStorage implements Storage {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSystemStorage.class);
 
-    @Inject
-    Path root;
+    private Path root;
+
+    public FileSystemStorage(Path root) {
+        this.root = root;
+    }
 
     @Override
     public long uploadLayer(String range, String uuid, InputStream inputStream) {

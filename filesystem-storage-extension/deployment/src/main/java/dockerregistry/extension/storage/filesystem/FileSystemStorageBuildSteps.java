@@ -15,6 +15,6 @@ public class FileSystemStorageBuildSteps {
 
     @BuildStep
     public AdditionalBeanBuildItem producer() {
-        return new AdditionalBeanBuildItem(FileSystemStorage.class);
+        return new AdditionalBeanBuildItem(FileSystemStorageProducer.class);
     }
 }
