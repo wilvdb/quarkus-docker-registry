@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>filesystem-storage-extension-runtime</artifactId>
+    <artifactId>filesystem-storage-extension</artifactId>
     <name>FileSystem Storage Extension - Runtime</name>
 
     <dependencies>
@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>dockerregistry</groupId>
-            <artifactId>storage-extension-runtime</artifactId>
+            <artifactId>storage-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

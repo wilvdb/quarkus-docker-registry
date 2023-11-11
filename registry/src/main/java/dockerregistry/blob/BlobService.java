@@ -1,7 +1,7 @@
 package dockerregistry.blob;
 
+import dockerregistry.extension.storage.Storage;
 import dockerregistry.internal.error.exception.BlobUploadUnkownException;
-import dockerregistry.internal.storage.FileSystemStorage;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -50,7 +50,7 @@ public class BlobService {
     }
 
     public long uploadLayer(String range, String uuid, InputStream inputStream) {
-        return storage.uploadLayer(range, uuid, inputStream);
+        return storage.upload(range, uuid, inputStream);
 
     }
 
@@ -83,7 +83,7 @@ public class BlobService {
     @Transactional
     public Optional<Blob> getLayer(String name, String digest) {
         return layerExists(name, digest)
-                .map(blob -> Blob.from(blob).withContent(storage.getLayer(name, digest)).build());
+                .map(blob -> Blob.from(blob).withContent(storage.download(name, digest)).build());
     }
 
 }

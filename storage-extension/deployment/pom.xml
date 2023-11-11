@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>storage-extension-runtime</artifactId>
+            <artifactId>storage-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

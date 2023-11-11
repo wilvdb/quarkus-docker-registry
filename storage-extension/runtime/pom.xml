@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>storage-extension-runtime</artifactId>
+    <artifactId>storage-extension</artifactId>
     <name>Storage Extension - Runtime</name>
 
     <dependencies>
@@ -34,7 +34,7 @@
                             <goal>extension-descriptor</goal>
                         </goals>
                         <configuration>
-                            <deployment>${project.groupId}:storage-extension-deployment:${project.version}
+                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}
                             </deployment>
                         </configuration>
                     </execution>

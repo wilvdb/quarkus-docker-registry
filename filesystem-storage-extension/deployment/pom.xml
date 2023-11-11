@@ -25,7 +25,12 @@
         </dependency>
         <dependency>
             <groupId>dockerregistry</groupId>
-            <artifactId>filesystem-storage-extension-runtime</artifactId>
+            <artifactId>storage-extension-deployment</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dockerregistry</groupId>
+            <artifactId>filesystem-storage-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
