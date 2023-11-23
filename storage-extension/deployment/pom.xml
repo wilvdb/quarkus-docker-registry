@@ -23,6 +23,10 @@
             <artifactId>storage-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health-spi</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
