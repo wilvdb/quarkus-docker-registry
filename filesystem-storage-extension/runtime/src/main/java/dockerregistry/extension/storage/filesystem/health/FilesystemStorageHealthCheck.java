@@ -23,9 +23,11 @@ public class FilesystemStorageHealthCheck implements HealthCheck {
         var builder = HealthCheckResponse.builder()
                 .name("File System Storage");
 
-        var path = configuration.location
-                .map(Path::of)
-                .orElseThrow(IllegalArgumentException::new);
+        if(configuration.location() == null) {
+            throw new IllegalArgumentException("Missing location");
+        }
+
+        var path = Path.of(configuration.location());
 
         if(path.toFile().exists()) {
             builder.up();

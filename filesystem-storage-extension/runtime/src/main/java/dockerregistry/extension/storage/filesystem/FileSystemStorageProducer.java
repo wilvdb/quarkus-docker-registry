@@ -18,9 +18,11 @@ public class FileSystemStorageProducer {
     @Default
     @Produces
     public FileSystemStorage fileSystemStorage() {
-        var path = configuration.location
-                .map(Path::of)
-                .orElseThrow(IllegalArgumentException::new);
+        if(configuration.location() == null) {
+            throw new IllegalArgumentException("Missing location");
+        }
+
+        var path = Path.of(configuration.location());
 
         if(!path.toFile().exists()) {
             throw new IllegalArgumentException(String.format("Path [%s] dpes not exist", path.toString()));

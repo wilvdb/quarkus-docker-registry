@@ -20,9 +20,13 @@ public class FileSystemStorageBuildSteps {
         return new AdditionalBeanBuildItem(FileSystemStorageProducer.class);
     }
 
-    @BuildStep
-    public HealthBuildItem addHealthCheck(StorageBuildTimeConfiguration storageBuildTimeConfiguration) {
-        return new HealthBuildItem("dockerregistry.extension.storage.filesystem.health.FilesystemStorageHealthCheck",
-                storageBuildTimeConfiguration.healthEnabled);
-    }
+//    @BuildStep
+//    public HealthBuildItem addHealthCheck(StorageBuildTimeConfiguration storageBuildTimeConfiguration) {
+//        if (capabilities.isPresent(Capability.SMALLRYE_HEALTH)) {
+//            return new HealthBuildItem("dockerregistry.extension.storage.filesystem.health.FilesystemStorageHealthCheck",
+//                    storageBuildTimeConfiguration.healthEnabled());
+//        } else {
+//            return null;
+//        }
+//    }
 }

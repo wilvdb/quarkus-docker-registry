@@ -1,17 +1,16 @@
 package dockerregistry.extension.storage.filesystem;
 
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
 
-import java.util.Optional;
+@ConfigMapping(prefix = "registry.filesystem.storage")
+@ConfigRoot(phase = ConfigPhase.RUN_TIME)
+public interface FileSystemStorageConfiguration {
 
-@ConfigRoot(prefix = "registry.storage.filesystem", phase = ConfigPhase.RUN_TIME)
-public class FileSystemStorageConfiguration {
-
-    /**
-     * Location of the root file system.
-     */
-    @ConfigItem
-    public Optional<String> location;
+        /**
+         * Location of the storage
+         * @return storage location
+         */
+        String location();
 }
