@@ -8,5 +8,5 @@ metadata:
     - "storage"
     - "data"
   status: "preview"
-  config:
-    - "registry.storage."
+#  config:
+#    - "registry.storage."

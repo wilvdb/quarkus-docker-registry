@@ -13,4 +13,5 @@ public interface FileSystemStorageConfiguration {
          * @return storage location
          */
         String location();
+
 }

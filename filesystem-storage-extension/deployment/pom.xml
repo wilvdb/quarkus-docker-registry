@@ -29,13 +29,12 @@
         </dependency>
         <dependency>
             <groupId>dockerregistry</groupId>
-            <artifactId>storage-extension-deployment</artifactId>
+            <artifactId>filesystem-storage-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>dockerregistry</groupId>
-            <artifactId>filesystem-storage-extension</artifactId>
-            <version>${project.version}</version>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health-spi</artifactId>
         </dependency>
     </dependencies>
 
