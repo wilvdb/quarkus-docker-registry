@@ -9,13 +9,14 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>filesystem-storage-extension-parent</artifactId>
-    <name>FileSystem Storage Quarkus Extension</name>
+
+    <artifactId>extensions-parent</artifactId>
+    <name>Quarkus Extensions</name>
     <packaging>pom</packaging>
 
     <modules>
-        <module>deployment</module>
-        <module>runtime</module>
+        <module>storage-extension</module>
+        <module>filesystem-storage-extension</module>
     </modules>
 
 </project>

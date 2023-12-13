@@ -35,8 +35,7 @@
     </dependencyManagement>
 
     <modules>
-<!--        <module>storage-extension</module>-->
-        <module>filesystem-storage-extension</module>
+        <module>extensions</module>
         <module>registry</module>
     </modules>
 
