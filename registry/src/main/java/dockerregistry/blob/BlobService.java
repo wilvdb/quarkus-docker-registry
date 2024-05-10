@@ -1,6 +1,6 @@
 package dockerregistry.blob;
 
-import dockerregistry.extension.storage.Storage;
+import dockerregistry.internal.storage.Storage;
 import dockerregistry.internal.error.exception.BlobUploadUnkownException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
