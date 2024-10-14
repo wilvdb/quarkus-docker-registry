@@ -1,0 +1,37 @@
+name: Java build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.3
+
+      - name: Maven build
+        run: mvn clean install -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true --no-transfer-progress
+
+      - name: Save target
+        id: save-target
+        uses: actions/cache/save@v4
+        with:
+          key: cache-target
+          path: target
+
