@@ -32,10 +32,6 @@ on:
         options:
           - java
           - js
-      README:
-        description: 'FOR COMPONENT. OPTIONAL. Small description of project in text or markdown'
-        required: false
-        type: string
       STARTING_BRANCH:
         description: 'Environment to run tests against'
         required: true
