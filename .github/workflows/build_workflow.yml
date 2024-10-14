@@ -26,7 +26,7 @@ jobs:
           maven-version: 3.9.3
 
       - name: Maven build
-        run: mvn clean install -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true --no-transfer-progress
+        run: mvn clean install -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true -DskipTests=true --no-transfer-progress
 
       - name: Save target
         id: save-target
@@ -35,3 +35,8 @@ jobs:
           key: cache-target
           path: target
 
+
+  deploy:
+    uses: ./.github/workflows/callable_workflow.yml
+    needs:
+      - build
