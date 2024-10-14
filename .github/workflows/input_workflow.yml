@@ -1,33 +1,99 @@
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
+      APP_CODE:
+        description: 'FOR APPLICATION. MANDATORY. Application code'
+        required: false
+        type: string
+      MAINTAINER:
+        description: 'FOR APPLICATION. MANDATORY. IAM id of the tech lead, that will be added as maintainer of the group.'
+        required: false
+        type: string
+      EMAIL_ADDRESS:
+        description: 'FOR APPLICATION. MANDATORY. Email address for the project, where CI/CD messages are sent. Must be a mailbox/mailing list, not a personal email address.'
+        required: false
+        type: string
+      COMPONENT_CODE:
+        description: 'FOR COMPONENT. MANDATORY. Component code.'
+        required: false
+        type: string
+      APP_GROUP_ID:
+        description: 'FOR COMPONENT. MANDATORY. Id of the application group (can be found in Settings → General)'
+        required: false
+        type: string
+      COMP_GROUP_ID:
+        description: 'Optional. In case the component group already exists, id of the component group for COMPONENT_KIND = 'lib' (can be found in Settings → General)'
+        required: false
+        type: string
+      TECHNOLOGY:
+        description: "FOR COMPONENT. MANDATORY. Values can be 'java' or 'js'. Default to 'java'"
+        type: choice
+        default: 'java'
+        options:
+          - java
+          - js
+      README:
+        description: 'FOR COMPONENT. OPTIONAL. Small description of project in text or markdown'
+        required: false
+        type: string
+      STARTING_BRANCH:
+        description: 'Environment to run tests against'
         required: true
-        default: 'warning'
+        default: 'main'
+        type: string
+      BOM_VERSION:
+        description: 'FOR COMPONENT. MANDATORY. BOM version to use when generating Java source code'
+        required: false
+        default: '3.5.0-SNAPSHOT'
+        type: string
+      FRONT_BASE_IMAGE:
+        description: 'FOR COMPONENT. MANDATORY. Base image to build vue.js based image'
+        required: false
+        default: 'nginx'
+        type: string
+      TARGET_ENVIRONMENTS:
+        description: 'FOR COMPONENT. MANDATORY. A comma separated environment list for deployment (green, orange or red)'
+        required: true
+        default: 'green,orange,red'
+        type: string
+      IS_EXPOSED_ON_INTERNET:
+        description: 'FOR COMPONENT. MANDATORY. Values can be 0 or 1 (If 0: the component is not supposed to be exposed on public internet. If 1: it is). Default to 0.'
+        type: boolean
+        default: false
+      DB_KIND:
+        description: "FOR COMPONENT. MANDATORY. Database to use for backend. Only values 'postgresql', 'oracle', 'db2' and 'none' are authorized"
+        required: true
+        default: postgresql
         type: choice
         options:
-          - info
-          - warning
-          - debug
-      tags:
-        description: 'Test scenario tags'
+          - db2
+          - h2
+          - none
+          - postgresql
+          - oracle
+      DB_SIZE:
+        description: 'FOR COMPONENT. MANDATORY. In case of Postgres DB, we must provide an approximate size (in GB) of the future Database in RED'
         required: false
-        type: boolean
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
+        default: 5
+        type: number
+      COMPONENT_KIND:
+        description: "FOR COMPONENT. MANDATORY. Component kind to generate (doesn't have any effect for 'js' TECHNOLOGY). Only values 'api', 'job' and 'cache' are authorized"
         required: true
+        type: choice
+        default: 'api'
+        options:
+          - api
+          - job
+          - cache
+          - lib
+      GITLAB_TOKEN_NAME:
+        description: 'FOR COMPONENT. MANDATORY. Name associated with the Gitlab token, necessary since we are checking git usernames in projects. Do not change unless you change the GITLAB_TOKEN'
+        required: true
+        default: 'MY BOT'
+        type: string
 
 jobs:
   log-the-inputs:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "Log level: $LEVEL"
-          echo "Tags: $TAGS"
-          echo "Environment: $ENVIRONMENT"
-        env:
-          LEVEL: ${{ inputs.logLevel }}
-          TAGS: ${{ inputs.tags }}
-          ENVIRONMENT: ${{ inputs.environment }}
+      - run: echo "Hello to you !!"
