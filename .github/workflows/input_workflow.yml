@@ -22,7 +22,7 @@ on:
         required: false
         type: string
       COMP_GROUP_ID:
-        description: 'Optional. In case the component group already exists, id of the component group for COMPONENT_KIND = 'lib' (can be found in Settings → General)'
+        description: "Optional. In case the component group already exists, id of the component group for COMPONENT_KIND = 'lib' (can be found in Settings → General)"
         required: false
         type: string
       TECHNOLOGY:
