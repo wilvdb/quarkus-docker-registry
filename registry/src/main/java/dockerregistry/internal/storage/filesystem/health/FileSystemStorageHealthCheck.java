@@ -1,5 +1,7 @@
 package dockerregistry.internal.storage.filesystem.health;
 
+import dockerregistry.internal.config.RegistryConfiguration;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
@@ -13,15 +15,15 @@ import java.nio.file.Path;
 //@ApplicationScoped
 public class FileSystemStorageHealthCheck implements HealthCheck {
 
-    @ConfigProperty(name = "registry.location", defaultValue = "/tmp")
-    Path location;
+    @Inject
+    RegistryConfiguration configuration;
 
     @Override
     public HealthCheckResponse call() {
         var builder = HealthCheckResponse.builder()
                 .name("File System Storage");
 
-        if(location.toFile().exists()) {
+        if(Path.of(configuration.storage().location()).toFile().exists()) {
             builder.up();
         } else {
             builder.down();
