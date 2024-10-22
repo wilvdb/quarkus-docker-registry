@@ -20,13 +20,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.3
-
       - name: Maven build
-        run: mvn clean install -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true -DskipTests=true --no-transfer-progress
+        run: mvn --batch-mode --update-snapshots verify -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true -DskipTests=true --no-transfer-progress
 
       - name: Save target
         id: save-target
@@ -35,8 +30,3 @@ jobs:
           key: cache-target
           path: target
 
-
-  deploy:
-    uses: wilvdb/action-tryout/.github/workflows/main.yml@229d6ab9f74f08790c6ff6c0eeb5d155817c7206
-    needs:
-      - build
