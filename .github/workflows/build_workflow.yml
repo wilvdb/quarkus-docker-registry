@@ -37,6 +37,6 @@ jobs:
 
 
   deploy:
-    uses: ./.github/workflows/callable_workflow.yml
+    uses: wilvdb/action-tryout/.github/workflows/main.yml@229d6ab9f74f08790c6ff6c0eeb5d155817c7206
     needs:
       - build
