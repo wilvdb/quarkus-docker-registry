@@ -63,3 +63,16 @@ jobs:
       - run: sudo apt-get -y install podman
       - name: Build image with podman
         run: mvn install -DskipTests=true -Dquarkus.container-image.build=true -Dquarkus.container-image.group=dockerregistry -Dquarkus.container-image.name=registry -Dquarkus.container-image.tag=1.0.0-SNAPSHOT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: dockerregistry/registry:1.0.0-SNAPSHOT
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'dockerregistry/registry:1.0.0-SNAPSHOT'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
