@@ -45,13 +45,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            .*/pom.xml
-            .*/Dockerfile.jvm
+            pom.xml
+            registry/pom.xml
+            registry/src/main/docker/Dockerfile.jvm
           sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v4
         with:
           name: jars
           path: registry/target/quarkus-app
+      - run: ls -al registry/target/quarkus-app
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
