@@ -45,8 +45,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            **/pom.xml
-            **/Dockerfile.jvm
+            .*/pom.xml
+            .*/Dockerfile.jvm
+          sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v4
         with:
           name: jars
