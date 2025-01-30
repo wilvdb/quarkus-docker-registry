@@ -62,4 +62,4 @@ jobs:
           cache: maven
       - run: sudo apt-get -y install podman
       - name: Build image with podman
-        run: mvn install -DskipTests=true -Dquarkus.container-image.build=true
+        run: mvn install -DskipTests=true -Dquarkus.container-image.build=true -Dquarkus.container-image.group=dockerregistry -Dquarkus.container-image.name=registry -Dquarkus.container-image.tag=1.0.0-SNAPSHOT
