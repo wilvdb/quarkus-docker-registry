@@ -53,7 +53,6 @@ jobs:
         with:
           name: jars
           path: registry/target/quarkus-app
-      - run: ls -al registry/target/quarkus-app
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -62,7 +61,17 @@ jobs:
           cache: maven
       - run: sudo apt-get -y install podman
       - name: Build image with podman
-        run: mvn install -DskipTests=true -Dquarkus.container-image.build=true -Dquarkus.container-image.group=dockerregistry -Dquarkus.container-image.name=registry -Dquarkus.container-image.tag=1.0.0-SNAPSHOT
+        run: |
+          mvn install \
+            -DskipTests=true \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.username=$DOCKERHUB_USERNAME \
+            -Dquarkus.container-image.password=${{secrets.DOCKERHUB_PASSWORD}} \
+            -Dquarkus.container-image.group=dockerregistry \
+            -Dquarkus.container-image.name=registry \
+            -Dquarkus.container-image.tag=1.0.0-SNAPSHOT
+      - run : ls -al
       - uses: actions/upload-artifact@v4
         with:
           name: docker
