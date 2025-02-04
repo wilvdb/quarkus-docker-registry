@@ -62,11 +62,12 @@ jobs:
       - run: sudo apt-get -y install podman
       - name: Build image with podman
         run: |
+          echo "${{vars.DOCKERHUB_USERNAME}}"
           mvn install \
             -DskipTests=true \
             -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
-            -Dquarkus.container-image.username=$DOCKERHUB_USERNAME \
+            -Dquarkus.container-image.username=${{vars.DOCKERHUB_USERNAME}} \
             -Dquarkus.container-image.password=${{secrets.DOCKERHUB_PASSWORD}} \
             -Dquarkus.container-image.group=dockerregistry \
             -Dquarkus.container-image.name=registry \
