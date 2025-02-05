@@ -1,0 +1,34 @@
+name: Native image build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Maven build
+        run: mvn --batch-mode --update-snapshots verify -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true -DskipTests=true --no-transfer-progress
+
+      - name: Save target
+        id: save-target
+        uses: actions/cache/save@v4
+        with:
+          key: cache-target
+          path: target
+

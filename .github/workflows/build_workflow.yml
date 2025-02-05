@@ -1,32 +1,98 @@
-name: Java build
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java image build
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+  workflow_dispatch:
+    inputs:
+      WITH_NATIVE:
+        description: 'Trigger native build'
+        type: boolean
+        default: false
 
 jobs:
-  build:
+  maven-build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package -DskipTests=true --file pom.xml
 
+    - uses: actions/upload-artifact@v4
+      with:
+        name: jars
+        path: registry/target/quarkus-app/**/*.jar
+
+  image-build:
+
+    runs-on: ubuntu-latest
+    needs:
+      - maven-build
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            pom.xml
+            registry/pom.xml
+            registry/src/main/docker/Dockerfile.jvm
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: jars
+          path: registry/target/quarkus-app
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+      - run: sudo apt-get -y install podman
+      - name: Build image with podman
+        run: |
+          echo "${{vars.DOCKERHUB_USERNAME}}"
+          mvn install \
+            -DskipTests=true \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.container-image.username=${{vars.DOCKERHUB_USERNAME}} \
+            -Dquarkus.container-image.password=${{secrets.DOCKERHUB_PASSWORD}} \
+            -Dquarkus.container-image.group=wvandenberghe \
+            -Dquarkus.container-image.name=dockerregistry \
+            -Dquarkus.container-image.tag=1.0.0-SNAPSHOT
 
-      - name: Maven build
-        run: mvn --batch-mode --update-snapshots verify -Dquarkus.profile=oc -Dstyle.color=always -Djansi.force=true -DskipTests=true --no-transfer-progress
+  image-scan:
 
-      - name: Save target
-        id: save-target
-        uses: actions/cache/save@v4
+    runs-on: ubuntu-latest
+    needs:
+      - image-build
+
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          key: cache-target
-          path: target
-
+          image-ref: 'docker.io/wvandenberghe/dockerregistry:1.0.0-SNAPSHOT'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
