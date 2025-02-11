@@ -67,7 +67,10 @@ jobs:
             -Dquarkus.container-image.group=wvandenberghe \
             -Dquarkus.container-image.name=dockerregistry \
             -Dquarkus.container-image.tag=native-1.0.0-SNAPSHOT \
-            -Dnative
+            -Dnative \
+            -Dstyle.color=always \
+            -Djansi.force=true \
+            --no-transfer-progress
 
   image-scan:
 
