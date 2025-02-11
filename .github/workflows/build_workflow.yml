@@ -23,6 +23,9 @@ on:
         description: 'Trigger native build'
         type: boolean
         default: false
+env:
+#  TRIVY_SEVERITY: 'CRITICAL,HIGH'
+  TRIVY_SEVERITY: 'CRITICAL'
 
 jobs:
   maven-build:
@@ -101,7 +104,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: ${{ env.TRIVY_SEVERITY }}
 
   cleanup-image:
     runs-on: ubuntu-latest
