@@ -115,7 +115,6 @@ jobs:
         run: |
           TOKEN=`curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d '{"username":"${{vars.DOCKERHUB_USERNAME}}", "password":"${{secrets.DOCKERHUB_PASSWORD}}"}' "https://hub.docker.com/v2/users/login/" | jq -r .token`
           curl "https://hub.docker.com/v2/repositories/wvandenberghe/dockerregistry/tags/1.0.0-SNAPSHOT/" -X DELETE -H "Authorization: JWT ${TOKEN}"
-          #skopeo delete --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT
 
   tag-latest:
     runs-on: ubuntu-latest
@@ -128,3 +127,18 @@ jobs:
       - run: sudo apt-get -y install skopeo
       - run: |
           skope copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker://wvandenberghe/dockerregistry:latest
+
+  upload-image-artifacts:
+    runs-on: ubuntu-latest
+    needs:
+      - image-scan
+
+    steps:
+      - run: sudo apt-get -y install skopeo
+      - run: |
+          skope copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker-archive:dockerregistry-1.0.0-SNAPSHOT.tar:wvandenberghe/dockerregistry:1.0.0-SNAPSHOT
+          skope copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:latest docker-archive:dockerregistry-latest.tar:wvandenberghe/dockerregistry:latest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: images
+          path: ./**/*.tar
