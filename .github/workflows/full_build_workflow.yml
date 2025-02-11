@@ -1,0 +1,25 @@
+name: Native image build
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      BUILD_TYPE:
+        description: 'Choose your build'
+        type: choice
+        options:
+          - native
+          - java
+          - both
+
+jobs:
+  java-build:
+    if: ${{ inputs.BUILD_TYPE == 'java' || inputs.BUILD_TYPE == 'both' }}
+    uses: ./.github/workflows/build_workflow.yml
+
+  native-build:
+    if: ${{ inputs.BUILD_TYPE == 'native' || inputs.BUILD_TYPE == 'both' }}
+    uses: ./.github/workflows/native_build_workflow.yml

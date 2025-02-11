@@ -1,3 +1,4 @@
+name: Test user input
 on:
   workflow_dispatch:
     inputs:
