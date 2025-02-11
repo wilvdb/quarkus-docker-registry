@@ -129,7 +129,7 @@ jobs:
     steps:
       - run: sudo apt-get -y install skopeo
       - run: |
-          skopeo copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker://wvandenberghe/dockerregistry:latest
+          skopeo copy --src-username ${{vars.DOCKERHUB_USERNAME}} --src-password ${{secrets.DOCKERHUB_PASSWORD}} --dest-username ${{vars.DOCKERHUB_USERNAME}} --dest-password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker://wvandenberghe/dockerregistry:latest
 
   upload-image-artifacts:
     runs-on: ubuntu-latest
@@ -139,8 +139,8 @@ jobs:
     steps:
       - run: sudo apt-get -y install skopeo
       - run: |
-          skopeo copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker-archive:dockerregistry-1.0.0-SNAPSHOT.tar:wvandenberghe/dockerregistry:1.0.0-SNAPSHOT
-          skopeo copy --username ${{vars.DOCKERHUB_USERNAME}} --password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:latest docker-archive:dockerregistry-latest.tar:wvandenberghe/dockerregistry:latest
+          skopeo copy --src-username ${{vars.DOCKERHUB_USERNAME}} --src-password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:1.0.0-SNAPSHOT docker-archive:dockerregistry-1.0.0-SNAPSHOT.tar:wvandenberghe/dockerregistry:1.0.0-SNAPSHOT
+          skopeo copy --src-username ${{vars.DOCKERHUB_USERNAME}} --src-password ${{secrets.DOCKERHUB_PASSWORD}} docker://wvandenberghe/dockerregistry:latest docker-archive:dockerregistry-latest.tar:wvandenberghe/dockerregistry:latest
       - uses: actions/upload-artifact@v4
         with:
           name: images
