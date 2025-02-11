@@ -60,6 +60,7 @@ jobs:
           echo "${{vars.DOCKERHUB_USERNAME}}"
           mvn install \
             -DskipTests=true \
+            -Dquarkus.native.container-runtime=podman \
             -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.username=${{vars.DOCKERHUB_USERNAME}} \
