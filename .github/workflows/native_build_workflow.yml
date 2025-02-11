@@ -61,6 +61,7 @@ jobs:
           mvn install \
             -DskipTests=true \
             -Dquarkus.native.container-runtime=podman \
+            -Dquarkus.native.container-build=true \
             -Dquarkus.container-image.build=true \
             -Dquarkus.container-image.push=true \
             -Dquarkus.container-image.username=${{vars.DOCKERHUB_USERNAME}} \
