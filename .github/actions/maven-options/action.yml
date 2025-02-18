@@ -1,0 +1,13 @@
+name: 'Maven Options'
+description: 'Compute Maven options for build'
+inputs:
+  native:  # id of input
+    description: 'Target native build'
+    default: 'false'
+
+outputs:
+  mvn-options:
+    description: 'Maven options for build'
+runs:
+  using: 'node20'
+  main: 'index.js'
