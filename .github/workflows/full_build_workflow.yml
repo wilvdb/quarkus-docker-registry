@@ -20,3 +20,5 @@ jobs:
   native-build:
     if: ${{ inputs.BUILD_TYPE == 'native' || inputs.BUILD_TYPE == 'both' }}
     uses: ./.github/workflows/native_build_workflow.yml
+    needs:
+      - java-build
