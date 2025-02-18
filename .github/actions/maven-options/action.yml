@@ -8,6 +8,10 @@ inputs:
 outputs:
   mvn-options:
     description: 'Maven options for build'
+  targets:
+    description: 'Build targets'
+  artifacts-name:
+    description: 'Artifacts name for caching'
 runs:
   using: 'node20'
   main: 'index.js'

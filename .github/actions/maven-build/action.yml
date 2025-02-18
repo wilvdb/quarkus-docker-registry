@@ -17,6 +17,16 @@ runs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-    - name: Compute Maven options
-      run: |
-        echo "hello"
+    - id: maven-options
+      uses: ./.github/actions/maven-options
+      with:
+        native: ${{ inputs.native }}
+    - name: Build with Maven
+      shell: bash
+      env:
+        MVN_OPTIONS: ${{ steps.maven-options.outputs.mvn-options }}
+      run: mvn $MVN_OPTIONS
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.maven-options.outputs.artifacts-name }}
+        path: ${{ steps.maven-options.outputs.targets }}
