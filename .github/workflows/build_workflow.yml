@@ -45,10 +45,10 @@ jobs:
       with:
         native: false
     - name: Build with Maven
-      env:
-        MVN_OPTIONS: ${{ steps.maven-options.outputs.mvn-options }}
-      #      run: mvn -B package -DskipTests=true -Dstyle.color=always -Djansi.force=true --no-transfer-progress --file pom.xml
-      run: mvn $MVN_OPTIONS
+#      env:
+#        MVN_OPTIONS: ${{ steps.maven-options.outputs.mvn-options }}
+      run: mvn -B package -DskipTests=true -Dstyle.color=always -Djansi.force=true --no-transfer-progress
+#      run: mvn $MVN_OPTIONS
 
     - uses: actions/upload-artifact@v4
       with:
